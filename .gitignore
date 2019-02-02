@@ -4,7 +4,10 @@
 [Bb]uild/
 [Bb]uilds/
 Assets/AssetStoreTools*
-Assets/TextMesh*Pro
+/Assets/TextMesh Pro/*
+/Assets/TextMesh Pro.meta
+/Assets/Libraries/TextMesh Pro/*
+/Assets/Libraries/TextMesh Pro.meta
 
 # Visual Studio cache directory
 .vs/
