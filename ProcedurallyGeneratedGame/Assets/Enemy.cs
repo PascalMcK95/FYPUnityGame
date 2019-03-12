@@ -3,69 +3,86 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Enemy : MonoBehaviour
+public class Enemy : Character
 {
-
-    //public Transform target;//set target from inspector instead of looking in Update
-    public float speed = 3f;
-
-    Rigidbody2D rigidbody;
-    Vector2 velocity;
-    Animator anim;
+    Vector3 enemyDirection;
     Vector3 enemyPosition;
-    bool facingRight = true;
     Vector3 playerPosition;
-    int health;
+    bool detected = false;
+
 
     void Start()
     {
-        health = 3;
-        rigidbody = GetComponent<Rigidbody2D>();
-        anim = GetComponent<Animator>();
+        base.Start();
     }
 
-    void Update()
+     void Update()
     {
-        enemyPosition = transform.localScale;
-       playerPosition = GameObject.Find("Player").transform.position;
-        Debug.Log(enemyPosition + " " + playerPosition);
-        //velocity = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")).normalized * 10;
-        //transform.LookAt(playerPosition);
+        MoveTowardsPlayer();
+    }
 
-        //move towards the player
-        if (Vector3.Distance(transform.position, enemyPosition) > 1f)
-        {//move if distance from target is greater than 1
-         // transform.Translate(new Vector3(speed * Time.deltaTime, speed * Time.deltaTime, 0));
-            transform.position = Vector3.MoveTowards(transform.position, playerPosition, speed/20);
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        //Debug.Log("Detected");
+        if (collision.gameObject.tag == "Player")
+        {
+            detected = true;
         }
-
-        //CheckIfDamaged();
     }
 
-    private void CheckIfDamaged()
+    private void OnTriggerExit2D(Collider2D collision)
     {
-        throw new NotImplementedException();
+        if (collision.gameObject.tag == "Player")
+        {
+            //Debug.Log("Escaped");
+            detected = false;
+            anim.ResetTrigger("Run");
+            anim.SetTrigger("Idle");
+        }
+    }
+
+
+    protected void MoveTowardsPlayer()
+    {
+        if (detected)
+        {
+            enemyPosition = transform.position;
+            enemyDirection = transform.localScale;
+            playerPosition = GameObject.Find("Player(Clone)").transform.position;
+            CheckIfFacingRightDirection();
+            anim.ResetTrigger("Run");
+            anim.ResetTrigger("Attack");
+
+            if (Vector3.Distance(enemyPosition, playerPosition) > 4f)
+            {
+                anim.ResetTrigger("Attack");
+                transform.position = Vector3.MoveTowards(enemyPosition, playerPosition, speed / 20);
+                anim.SetTrigger("Run");
+            }
+            else if (Vector3.Distance(enemyPosition, playerPosition) <= 4f)
+            {
+                anim.ResetTrigger("Run");
+                anim.SetTrigger("Attack");
+            }
+        }
+    }
+
+    private void CheckIfFacingRightDirection()
+    {
+        if (transform.position.x > playerPosition.x && !facingLeft)
+        {
+            FlipAsset();
+        }
+        else if (transform.position.x < playerPosition.x && facingLeft)
+        {
+            FlipAsset();
+        }
     }
 
     void FixedUpdate()
     {
-        //float h = Input.GetAxis("Horizontal");
-        //if (h > 0 && !facingRight)
-        //    Flip();
-        //else if (h < 0 && facingRight)
-        //    Flip();
-              float h = Input.GetAxis("Horizontal");
-        if (gameObject.transform.position.x > 0 && !facingRight)
-            Flip();
-        else if (gameObject.transform.position.x < 0 && facingRight)
-            Flip();
+
     }
 
-    void Flip()
-    {
-        facingRight = !facingRight;
-        Vector3 theScale = transform.localScale;
-        theScale.x *= -1;
-        transform.localScale = theScale;
-    }
 }
