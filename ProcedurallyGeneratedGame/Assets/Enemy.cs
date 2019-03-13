@@ -9,14 +9,45 @@ public class Enemy : Character
     Vector3 enemyPosition;
     Vector3 playerPosition;
     bool detected = false;
+    float sphereRadius= 20;
+    int count = 0;
+
+    private GameObject  enemy;
+    private GameObject mesh;
+
+    Collider2D enemyCollider;
+    MeshCollider meshCollider;
+    private bool alreadySpawned= false;
+    GenerateEnemies enemyGen;
+    Vector2 position;
+   // public Enemy newEnemy;
+
+    public int min;
+    public int max;
+    float randomX;
+    float randomY;
 
 
     void Start()
     {
+  
+
+
+        //CheckSpawnPosition();
         base.Start();
     }
 
-     void Update()
+    private void CheckSpawnPosition()
+    {
+        if (Physics.CheckSphere(transform.position, sphereRadius))
+        {
+            GameObject.Destroy(this);
+            count++;
+            Debug.Log("Destroyed " + count);
+        }
+    }
+
+    void Update()
     {
         MoveTowardsPlayer();
     }
@@ -29,6 +60,46 @@ public class Enemy : Character
         {
             detected = true;
         }
+    }
+
+    //private void OnCollisionEnter2D(Collision2D collision)
+    //{
+    //    //if (collision.gameObject.tag == "CaveMesh" && alreadySpawned == false)
+    //    //{
+    //    //    //alreadySpawned = true;
+
+    //    //    Debug.Log("I spawned in wall");
+    //    //    //Destroy(this.gameObject);
+    //    //    //enemyGen.SpawnEnemies();
+    //    //    Respawn();
+
+    //    //    Debug.Log("Destroy");
+    //    //}
+    //    //alreadySpawned = true;
+
+    //    while (collision.gameObject.tag == "CaveMesh" && alreadySpawned == false)
+    //    {
+    //        //alreadySpawned = true;
+
+    //        Debug.Log("I spawned in wall");
+    //        //Destroy(this.gameObject);
+    //        //enemyGen.SpawnEnemies();
+    //       // Respawn();
+
+    //        //Debug.Log("Destroy");
+    //    }
+    //    //alreadySpawned = true;
+    //}
+
+    private void Respawn()
+    {
+        randomY = UnityEngine.Random.Range(min, max);
+        randomX = UnityEngine.Random.Range(min, max);
+
+        position = new Vector3(randomX, randomY, 0);
+        //Instantiate(newEnemy, position, Quaternion.identity);
+        transform.Translate(position);
+        Debug.Log("Respawn");
     }
 
     private void OnTriggerExit2D(Collider2D collision)
