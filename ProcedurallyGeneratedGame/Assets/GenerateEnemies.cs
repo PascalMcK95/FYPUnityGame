@@ -20,7 +20,7 @@ public class GenerateEnemies : MonoBehaviour
     {
         enemies = GameObject.FindGameObjectsWithTag("Enemy");
         SpawnEnemies();
-        Debug.Log("Enemies " + enemies.Length);
+       // Debug.Log("Enemies " + enemies.Length);
         //CheckEnemyPosition();
     }
 

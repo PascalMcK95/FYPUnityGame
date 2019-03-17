@@ -6,10 +6,10 @@ using UnityEngine;
 public class Enemy : Character
 {
     Vector3 enemyDirection;
-    Vector3 enemyPosition;
+   Vector3 position;
     Vector3 playerPosition;
     bool detected = false;
-    float sphereRadius= 20;
+    public float sphereRadius;
     int count = 0;
 
     private GameObject  enemy;
@@ -19,94 +19,184 @@ public class Enemy : Character
     MeshCollider meshCollider;
     private bool alreadySpawned= false;
     GenerateEnemies enemyGen;
-    Vector2 position;
-   // public Enemy newEnemy;
+   // Vector2 position;
+    Vector2 directionCheck;
+    // public Enemy newEnemy;
+    Vector3 test = new Vector3( 0, 0, 0 );
+
+    Vector2 moveEnemy;
 
     public int min;
     public int max;
     float randomX;
     float randomY;
 
+    public LayerMask caveLayer;
+    RaycastHit2D hit;
+
 
     void Start()
     {
-  
-
-
-        //CheckSpawnPosition();
+        moveEnemy = new Vector2();
         base.Start();
+        //CheckSpawnPosition();
+       // CheckForCollisons();
+    }
+    //private void OnDrawGizmos()
+    //{
+    //    Gizmos.color = Color.red;
+    //    Gizmos.DrawSphere(transform.position, 5);
+    //}
+
+    private void CheckForCollisons()
+    {
+        count++;
+        Debug.Log("collison check " + count);
+        if (Physics2D.CircleCast(transform.position, 5,test))
+        {
+            Debug.Log("Respawning");
+            Respawn();
+        }
+
     }
 
     private void CheckSpawnPosition()
     {
-        if (Physics.CheckSphere(transform.position, sphereRadius))
+        directionCheck = Vector2.down;
+        position = transform.position;
+        float distance = 10;
+
+        hit = Physics2D.Raycast(position, directionCheck, distance, caveLayer);
+        if (hit.collider != null)
         {
-            GameObject.Destroy(this);
-            count++;
-            Debug.Log("Destroyed " + count);
+            Debug.Log(hit.distance + " down green");
+            // Debug.DrawRay(transform.position, Vector2.down * 15, Color.green,20);
+            //  Debug.Log("need to move up");
+            moveEnemy.y += 15;
+           // Respawn();
         }
+
+        directionCheck = Vector2.up;
+        hit = Physics2D.Raycast(position, directionCheck, distance, caveLayer);
+        if (hit.collider != null)
+        {
+            Debug.Log(hit.distance + " up red");
+          
+           // Debug.DrawRay(transform.position, Vector2.up*15, Color.red,20);
+            //Respawn();
+              moveEnemy.y += -10;
+        }
+        directionCheck = Vector2.left;
+        hit = Physics2D.Raycast(position, directionCheck, distance, caveLayer);
+        if (hit.collider != null)
+        {
+            Debug.Log(hit.distance + " left blue");
+            //Debug.DrawRay(transform.position, Vector2.left * 15, Color.blue,20);
+            //Respawn();
+            //  Debug.Log("need to move right");
+              moveEnemy.x += 15;
+        }
+        directionCheck = Vector2.right;
+        hit = Physics2D.Raycast(position, directionCheck, distance, caveLayer);
+        if (hit.collider != null)
+        {
+            Debug.Log(hit.distance + " right yellow");
+            //Debug.DrawRay(transform.position, Vector2.right * 15, Color.yellow,20);
+            //Respawn();
+            //Debug.Log("need to move left");
+             moveEnemy.x += -10;
+        }
+        // Debug.Log("moving enemy " + moveEnemy.x + " " + moveEnemy.y);
+        // 
+
+        MoveEnemy(moveEnemy);
+       // Debug.Log("Enemy Moved ******* " + moveEnemy.x + " " + moveEnemy.y);
     }
+
+    private void MoveEnemy(Vector2 moveEnemy)
+    {
+        transform.Translate(moveEnemy);
+        Debug.Log("Enemy Moved ******* " + moveEnemy.x + " " + moveEnemy.y);
+        CheckSpawnPosition();
+    }
+
+    //private void CheckOutsideSpawn()
+    //{
+    //    position = transform.position;
+    //    float distance = 2000.0f;
+
+    //    directionCheck = Vector2.down;
+    //    hit = Physics2D.Raycast(position, directionCheck, distance, caveLayer);
+    //    if (hit.collider != null)
+    //    {
+    //        Debug.Log("outside down *****");
+    //        Respawn();
+    //        CheckSpawnPosition();
+    //    }
+
+    //    directionCheck = Vector2.up;
+    //    hit = Physics2D.Raycast(position, directionCheck, distance, caveLayer);
+    //    if (hit.collider != null)
+    //    {
+    //        Debug.Log("outside up");
+    //        Respawn();
+    //        CheckSpawnPosition();
+    //    }
+
+    //    directionCheck = Vector2.left;
+    //    hit = Physics2D.Raycast(position, directionCheck, distance, caveLayer);
+    //    if (hit.collider != null)
+    //    {
+    //        Debug.Log("outside left *********");
+    //        Respawn();
+    //        CheckSpawnPosition();
+    //    }
+
+    //    directionCheck = Vector2.right;
+    //    hit = Physics2D.Raycast(position, directionCheck, distance, caveLayer);
+    //    if (hit.collider != null)
+    //    {
+    //        Debug.Log("outside right");
+    //        Respawn();
+    //        CheckSpawnPosition();
+    //    }
+    //}
 
     void Update()
     {
+        position = transform.position;
+        //hit = Physics2D.Raycast(position, directionCheck, distance, caveLayer);
+        //CheckSpawnPosition();
         MoveTowardsPlayer();
     }
 
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        //Debug.Log("Detected");
         if (collision.gameObject.tag == "Player")
         {
             detected = true;
         }
     }
 
-    //private void OnCollisionEnter2D(Collision2D collision)
-    //{
-    //    //if (collision.gameObject.tag == "CaveMesh" && alreadySpawned == false)
-    //    //{
-    //    //    //alreadySpawned = true;
-
-    //    //    Debug.Log("I spawned in wall");
-    //    //    //Destroy(this.gameObject);
-    //    //    //enemyGen.SpawnEnemies();
-    //    //    Respawn();
-
-    //    //    Debug.Log("Destroy");
-    //    //}
-    //    //alreadySpawned = true;
-
-    //    while (collision.gameObject.tag == "CaveMesh" && alreadySpawned == false)
-    //    {
-    //        //alreadySpawned = true;
-
-    //        Debug.Log("I spawned in wall");
-    //        //Destroy(this.gameObject);
-    //        //enemyGen.SpawnEnemies();
-    //       // Respawn();
-
-    //        //Debug.Log("Destroy");
-    //    }
-    //    //alreadySpawned = true;
-    //}
 
     private void Respawn()
     {
+        count++;
         randomY = UnityEngine.Random.Range(min, max);
         randomX = UnityEngine.Random.Range(min, max);
 
-        position = new Vector3(randomX, randomY, 0);
-        //Instantiate(newEnemy, position, Quaternion.identity);
+        position = new Vector2(randomX, randomY);
         transform.Translate(position);
-        Debug.Log("Respawn");
+        Debug.Log(randomX + " " + randomY + " Respawn " + count);
+        //CheckSpawnPosition();
+       // CheckForCollisons();
     }
 
     private void OnTriggerExit2D(Collider2D collision)
     {
         if (collision.gameObject.tag == "Player")
         {
-            //Debug.Log("Escaped");
             detected = false;
             anim.ResetTrigger("Run");
             anim.SetTrigger("Idle");
@@ -118,20 +208,20 @@ public class Enemy : Character
     {
         if (detected)
         {
-            enemyPosition = transform.position;
+            position = transform.position;
             enemyDirection = transform.localScale;
-            playerPosition = GameObject.Find("Player(Clone)").transform.position;
+            playerPosition = GameObject.FindGameObjectWithTag("Player").transform.position;
             CheckIfFacingRightDirection();
             anim.ResetTrigger("Run");
             anim.ResetTrigger("Attack");
 
-            if (Vector3.Distance(enemyPosition, playerPosition) > 4f)
+            if (Vector3.Distance(position, playerPosition) > 4f)
             {
                 anim.ResetTrigger("Attack");
-                transform.position = Vector3.MoveTowards(enemyPosition, playerPosition, speed / 20);
+                transform.position = Vector3.MoveTowards(position, playerPosition, speed / 20);
                 anim.SetTrigger("Run");
             }
-            else if (Vector3.Distance(enemyPosition, playerPosition) <= 4f)
+            else if (Vector3.Distance(position, playerPosition) <= 4f)
             {
                 anim.ResetTrigger("Run");
                 anim.SetTrigger("Attack");

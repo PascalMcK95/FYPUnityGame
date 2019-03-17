@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class Player : Character
 {
-
     Vector3 scale;
 
     void Start()
@@ -18,6 +17,7 @@ public class Player : Character
         direction = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")).normalized * 10;
         CheckDirection();
         Animate();
+
         base.Update();
     }
 
