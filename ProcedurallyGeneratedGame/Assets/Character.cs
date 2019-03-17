@@ -7,7 +7,7 @@ public abstract class Character : MonoBehaviour {
     [SerializeField]
     protected float speed;
     [SerializeField]
-    protected float health;
+    //protected float health;
     Vector3 theScale;
 
     public Animator anim;

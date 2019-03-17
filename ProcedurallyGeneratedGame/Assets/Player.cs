@@ -6,10 +6,25 @@ public class Player : Character
 {
     Vector3 scale;
 
+    private float timeBetweenAttack;
+    public float startTimeBetweenAttack;
+    public int damage;
+    Collider2D[] enemiesToDamage;
+    public Transform attackPosition;
+    public float attackRange;
+    public LayerMask whatIsAnEnemy;
+
     void Start()
     {
         scale = transform.localScale;
         base.Start();
+    }
+
+    // shows area in range of taking damage
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(attackPosition.position, attackRange);
     }
 
     protected override void Update()
@@ -30,9 +45,13 @@ public class Player : Character
     {
         float h = Input.GetAxis("Horizontal");
         if (h > 0 && !facingLeft)
+        {
             FlipAsset();
+        }
         else if (h < 0 && facingLeft)
+        {
             FlipAsset();
+        }
     }
 
 
@@ -51,8 +70,35 @@ public class Player : Character
 
         if (Input.GetMouseButtonDown(1) || Input.GetKeyDown("space"))
         {
+            anim.ResetTrigger("Idle");
+            anim.ResetTrigger("Run");
+            //Debug.Log("Attacking");
             anim.SetTrigger("Attack");
+            enemiesToDamage = Physics2D.OverlapCircleAll(attackPosition.position, attackRange, whatIsAnEnemy);
+            if (enemiesToDamage.Length > 0)
+            {
+                for (int i = 0; i < enemiesToDamage.Length; i++)
+                {
+                    if (enemiesToDamage[i].tag != "Untagged")
+                    {
+                        enemiesToDamage[i].GetComponent<Enemy>().TakeDamage(damage);
+                    }
+                }
+            }
         }
+       
+        // timeBetweenAttack = startTimeBetweenAttack;
+
+        //}
+        //else
+        //{
+        //    timeBetweenAttack -= Time.deltaTime;
+        //}
+
+        //if (Input.GetMouseButtonDown(1) || Input.GetKeyDown("space"))
+        //{
+        //    anim.SetTrigger("Attack");
+        //}
 
     }
 }

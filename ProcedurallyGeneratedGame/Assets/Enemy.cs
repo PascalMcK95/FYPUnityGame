@@ -17,12 +17,12 @@ public class Enemy : Character
 
     Collider2D enemyCollider;
     MeshCollider meshCollider;
-    private bool alreadySpawned= false;
+    //private bool alreadySpawned= false;
     GenerateEnemies enemyGen;
    // Vector2 position;
     Vector2 directionCheck;
     // public Enemy newEnemy;
-    Vector3 test = new Vector3( 0, 0, 0 );
+   // Vector3 test = new Vector3( 0, 0, 0 );
 
     Vector2 moveEnemy;
 
@@ -34,9 +34,14 @@ public class Enemy : Character
     public LayerMask caveLayer;
     RaycastHit2D hit;
 
+    public int health;
+
+    private bool dead;
+
 
     void Start()
     {
+        dead = false;
         moveEnemy = new Vector2();
         base.Start();
         //CheckSpawnPosition();
@@ -48,17 +53,16 @@ public class Enemy : Character
     //    Gizmos.DrawSphere(transform.position, 5);
     //}
 
-    private void CheckForCollisons()
-    {
-        count++;
-        Debug.Log("collison check " + count);
-        if (Physics2D.CircleCast(transform.position, 5,test))
-        {
-            Debug.Log("Respawning");
-            Respawn();
-        }
-
-    }
+    //private void CheckForCollisons()
+    //{
+    //    count++;
+    //    Debug.Log("collison check " + count);
+    //    if (Physics2D.CircleCast(transform.position, 5, test))
+    //    {
+    //        Debug.Log("Respawning");
+    //        Respawn();
+    //    }/////////////
+    //}
 
     private void CheckSpawnPosition()
     {
@@ -73,7 +77,7 @@ public class Enemy : Character
             // Debug.DrawRay(transform.position, Vector2.down * 15, Color.green,20);
             //  Debug.Log("need to move up");
             moveEnemy.y += 15;
-           // Respawn();
+            // Respawn();
         }
 
         directionCheck = Vector2.up;
@@ -81,10 +85,10 @@ public class Enemy : Character
         if (hit.collider != null)
         {
             Debug.Log(hit.distance + " up red");
-          
-           // Debug.DrawRay(transform.position, Vector2.up*15, Color.red,20);
+
+            // Debug.DrawRay(transform.position, Vector2.up*15, Color.red,20);
             //Respawn();
-              moveEnemy.y += -10;
+            moveEnemy.y += -10;
         }
         directionCheck = Vector2.left;
         hit = Physics2D.Raycast(position, directionCheck, distance, caveLayer);
@@ -94,7 +98,7 @@ public class Enemy : Character
             //Debug.DrawRay(transform.position, Vector2.left * 15, Color.blue,20);
             //Respawn();
             //  Debug.Log("need to move right");
-              moveEnemy.x += 15;
+            moveEnemy.x += 15;
         }
         directionCheck = Vector2.right;
         hit = Physics2D.Raycast(position, directionCheck, distance, caveLayer);
@@ -104,14 +108,14 @@ public class Enemy : Character
             //Debug.DrawRay(transform.position, Vector2.right * 15, Color.yellow,20);
             //Respawn();
             //Debug.Log("need to move left");
-             moveEnemy.x += -10;
+            moveEnemy.x += -10;
         }
         // Debug.Log("moving enemy " + moveEnemy.x + " " + moveEnemy.y);
         // 
 
-        MoveEnemy(moveEnemy);
-       // Debug.Log("Enemy Moved ******* " + moveEnemy.x + " " + moveEnemy.y);
-    }
+        //    MoveEnemy(moveEnemy);
+        //   // Debug.Log("Enemy Moved ******* " + moveEnemy.x + " " + moveEnemy.y);
+        }
 
     private void MoveEnemy(Vector2 moveEnemy)
     {
@@ -168,7 +172,38 @@ public class Enemy : Character
         //hit = Physics2D.Raycast(position, directionCheck, distance, caveLayer);
         //CheckSpawnPosition();
         MoveTowardsPlayer();
+
+        if (health <= 0 && dead == false)
+        {
+            Death();
+        }
     }
+
+    private void Death()
+    {
+        dead = true;
+
+        anim.ResetTrigger("Idle");
+        anim.ResetTrigger("Run");
+        anim.ResetTrigger("Attack");
+        anim.ResetTrigger("Damaged");
+        anim.SetBool("Death", true);
+        //while (dead)
+        //{
+        //    if (this.anim.GetCurrentAnimatorStateInfo(1).IsName("Death"))
+        //    {
+        //        Debug.Log("Animation finished");
+        //        anim.ResetTrigger("Death");
+        //        Destroy(this.gameObject);
+        //    }
+        //}
+      
+
+        //Destroy(this.gameObject);
+        Debug.Log("Enemy died");
+        // Destroy(this.gameObject);
+    }
+
 
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -206,26 +241,38 @@ public class Enemy : Character
 
     protected void MoveTowardsPlayer()
     {
-        if (detected)
+        if (dead == false)
         {
-            position = transform.position;
-            enemyDirection = transform.localScale;
-            playerPosition = GameObject.FindGameObjectWithTag("Player").transform.position;
-            CheckIfFacingRightDirection();
+            if (detected)
+            {
+                position = transform.position;
+                enemyDirection = transform.localScale;
+                playerPosition = GameObject.FindGameObjectWithTag("Player").transform.position;
+                CheckIfFacingRightDirection();
+                anim.ResetTrigger("Run");
+                anim.ResetTrigger("Attack");
+                anim.ResetTrigger("Damaged");
+
+                if (Vector3.Distance(position, playerPosition) > 4f)
+                {
+                    anim.ResetTrigger("Attack");
+                    transform.position = Vector3.MoveTowards(position, playerPosition, speed / 20);
+                    anim.SetTrigger("Run");
+                }
+                else if (Vector3.Distance(position, playerPosition) <= 4f)
+                {
+                    anim.ResetTrigger("Run");
+                    anim.SetTrigger("Attack");
+                }
+            }
+        }
+        else
+        {
             anim.ResetTrigger("Run");
             anim.ResetTrigger("Attack");
-
-            if (Vector3.Distance(position, playerPosition) > 4f)
-            {
-                anim.ResetTrigger("Attack");
-                transform.position = Vector3.MoveTowards(position, playerPosition, speed / 20);
-                anim.SetTrigger("Run");
-            }
-            else if (Vector3.Distance(position, playerPosition) <= 4f)
-            {
-                anim.ResetTrigger("Run");
-                anim.SetTrigger("Attack");
-            }
+            anim.ResetTrigger("Death");
+            anim.ResetTrigger("Idle");
+            anim.ResetTrigger("Damaged");
         }
     }
 
@@ -241,9 +288,21 @@ public class Enemy : Character
         }
     }
 
-    void FixedUpdate()
+    public void TakeDamage(int damage)
     {
+        health -= damage;
+        anim.SetTrigger("Damaged");
+       // WaitForAnimationToFinish("Damaged");
+        Debug.Log("Damage taken " + damage + " health remaining " + health);
+    }
 
+    private void WaitForAnimationToFinish(string animation)
+    {
+        if (this.anim.GetCurrentAnimatorStateInfo(0).IsName(animation))
+        {
+            Debug.Log("Animation finished");
+            anim.ResetTrigger(animation);
+        }
     }
 
 }
