@@ -14,12 +14,15 @@ public class Player : Character
     public float attackRange;
     public LayerMask whatIsAnEnemy;
     public int health;
-    bool dead;
+    public bool dead;
     Health healthBar;
+    public Score scoreBoard;
+
 
     void Start()
     {
         healthBar = gameObject.GetComponent<Health>();
+        //scoreBoard = gameObject.GetComponent<Score>();
         dead = false;
         scale = transform.localScale;
         base.Start();
@@ -121,6 +124,7 @@ public class Player : Character
                         if (enemiesToDamage[i].tag != "Untagged")
                         {
                             enemiesToDamage[i].GetComponent<Enemy>().TakeDamage(damage);
+                            scoreBoard.AddDamageToScore();
                         }
                     }
                 }

@@ -169,8 +169,8 @@ public class Enemy : Character
             anim.ResetTrigger("Run");
             anim.ResetTrigger("Attack");
             anim.ResetTrigger("Death");
-            anim.ResetTrigger("Idle");
             anim.ResetTrigger("Damaged");
+            anim.SetTrigger("Idle");
         }
     }
 
@@ -182,6 +182,7 @@ public class Enemy : Character
         }
         else
         {
+            anim.ResetTrigger("Attack");
             playerDead = true;
         }
     }
@@ -212,6 +213,10 @@ public class Enemy : Character
         {
             timeBetweenAttack -= Time.deltaTime;
         }
+        //if(timeBetweenAttack >= 2)
+        //{
+        //    anim.ResetTrigger("Attack");
+        //}
     }
 
     private void CheckIfFacingRightDirection()
