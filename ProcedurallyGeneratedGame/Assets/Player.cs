@@ -6,16 +6,19 @@ public class Player : Character
 {
     Vector3 scale;
 
-    private float timeBetweenAttack;
-    public float startTimeBetweenAttack;
+    //private float timeBetweenAttack;
+    //public float startTimeBetweenAttack;
     public int damage;
     Collider2D[] enemiesToDamage;
     public Transform attackPosition;
     public float attackRange;
     public LayerMask whatIsAnEnemy;
+    public int health;
+    bool dead;
 
     void Start()
     {
+        dead = false;
         scale = transform.localScale;
         base.Start();
     }
@@ -33,12 +36,55 @@ public class Player : Character
         CheckDirection();
         Animate();
 
+        if (health <= 0 && dead == false)
+        {
+            Death();
+        }
+
         base.Update();
     }
 
     void FixedUpdate()
     {
      
+    }
+
+    public void TakeDamage(int damage)
+    {
+        health -= damage;
+        anim.ResetTrigger("Idle");
+        anim.ResetTrigger("Run");
+        anim.ResetTrigger("Attack");
+        anim.SetTrigger("Damaged");
+        // WaitForAnimationToFinish("Damaged");
+        //Debug.Log("Damage taken " + damage + " health remaining " + health);
+    }
+
+    private void Death()
+    {
+        dead = true;
+
+        anim.ResetTrigger("Idle");
+        anim.ResetTrigger("Run");
+        anim.ResetTrigger("Attack");
+        anim.ResetTrigger("Damaged");
+        anim.SetBool("Death", true);
+        Destroy(this.gameObject, 1);
+
+        //while (dead)
+        //{
+        //    if (this.anim.GetCurrentAnimatorStateInfo(1).IsName("Death"))
+        //    {
+        //        Debug.Log("Animation finished");
+        //        anim.ResetTrigger("Death");
+        //        Destroy(this.gameObject);
+        //    }
+        //}
+
+
+        //Destroy(this.gameObject);
+        Debug.Log("Player Died");
+        // Destroy(this.gameObject);
     }
 
     private void CheckDirection()
@@ -57,48 +103,47 @@ public class Player : Character
 
     void Animate()
     {
-        if (Input.GetAxisRaw("Horizontal") != 0 || Input.GetAxisRaw("Vertical") != 0)
+        if(dead == false)
         {
-            anim.ResetTrigger("Idle");
-            anim.SetTrigger("Run");
-        }
-        else if (Input.GetAxisRaw("Horizontal") == 0 && Input.GetAxisRaw("Vertical") == 0)
-        {
-            anim.ResetTrigger("Run");
-            anim.SetTrigger("Idle");
-        }
-
-        if (Input.GetMouseButtonDown(1) || Input.GetKeyDown("space"))
-        {
-            anim.ResetTrigger("Idle");
-            anim.ResetTrigger("Run");
-            //Debug.Log("Attacking");
-            anim.SetTrigger("Attack");
-            enemiesToDamage = Physics2D.OverlapCircleAll(attackPosition.position, attackRange, whatIsAnEnemy);
-            if (enemiesToDamage.Length > 0)
+            if (Input.GetAxisRaw("Horizontal") != 0 || Input.GetAxisRaw("Vertical") != 0)
             {
-                for (int i = 0; i < enemiesToDamage.Length; i++)
+                anim.ResetTrigger("Idle");
+                anim.SetTrigger("Run");
+            }
+            else if (Input.GetAxisRaw("Horizontal") == 0 && Input.GetAxisRaw("Vertical") == 0)
+            {
+                anim.ResetTrigger("Run");
+                anim.SetTrigger("Idle");
+            }
+
+            if (Input.GetMouseButtonDown(1) || Input.GetKeyDown("space"))
+            {
+                anim.ResetTrigger("Idle");
+                anim.ResetTrigger("Run");
+                //Debug.Log("Attacking");
+                anim.SetTrigger("Attack");
+                enemiesToDamage = Physics2D.OverlapCircleAll(attackPosition.position, attackRange, whatIsAnEnemy);
+                if (enemiesToDamage.Length > 0)
                 {
-                    if (enemiesToDamage[i].tag != "Untagged")
+                    for (int i = 0; i < enemiesToDamage.Length; i++)
                     {
-                        enemiesToDamage[i].GetComponent<Enemy>().TakeDamage(damage);
+                        if (enemiesToDamage[i].tag != "Untagged")
+                        {
+                            enemiesToDamage[i].GetComponent<Enemy>().TakeDamage(damage);
+                        }
                     }
                 }
             }
         }
-       
-        // timeBetweenAttack = startTimeBetweenAttack;
-
-        //}
-        //else
-        //{
-        //    timeBetweenAttack -= Time.deltaTime;
-        //}
-
-        //if (Input.GetMouseButtonDown(1) || Input.GetKeyDown("space"))
-        //{
-        //    anim.SetTrigger("Attack");
-        //}
+        else
+        {
+            anim.ResetTrigger("Run");
+            anim.ResetTrigger("Attack");
+            //anim.ResetTrigger("Death");
+            anim.ResetTrigger("Idle");
+            anim.ResetTrigger("Damaged");
+            anim.SetBool("Death", true);
+        }
 
     }
 }
