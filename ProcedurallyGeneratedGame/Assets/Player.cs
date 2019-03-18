@@ -15,9 +15,11 @@ public class Player : Character
     public LayerMask whatIsAnEnemy;
     public int health;
     bool dead;
+    Health healthBar;
 
     void Start()
     {
+        healthBar = gameObject.GetComponent<Health>();
         dead = false;
         scale = transform.localScale;
         base.Start();
@@ -56,8 +58,7 @@ public class Player : Character
         anim.ResetTrigger("Run");
         anim.ResetTrigger("Attack");
         anim.SetTrigger("Damaged");
-        // WaitForAnimationToFinish("Damaged");
-        //Debug.Log("Damage taken " + damage + " health remaining " + health);
+        healthBar.RemoveHeart();
     }
 
     private void Death()
@@ -69,34 +70,24 @@ public class Player : Character
         anim.ResetTrigger("Attack");
         anim.ResetTrigger("Damaged");
         anim.SetBool("Death", true);
-        Destroy(this.gameObject, 1);
+        Destroy(this.gameObject, 2);
 
-        //while (dead)
-        //{
-        //    if (this.anim.GetCurrentAnimatorStateInfo(1).IsName("Death"))
-        //    {
-        //        Debug.Log("Animation finished");
-        //        anim.ResetTrigger("Death");
-        //        Destroy(this.gameObject);
-        //    }
-        //}
-
-
-        //Destroy(this.gameObject);
-        Debug.Log("Player Died");
-        // Destroy(this.gameObject);
+        //Debug.Log("Player Died");
     }
 
     private void CheckDirection()
     {
-        float h = Input.GetAxis("Horizontal");
-        if (h > 0 && !facingLeft)
+        if(anim.GetBool("Attack") == false)
         {
-            FlipAsset();
-        }
-        else if (h < 0 && facingLeft)
-        {
-            FlipAsset();
+            float h = Input.GetAxis("Horizontal");
+            if (h > 0 && !facingLeft)
+            {
+                FlipAsset();
+            }
+            else if (h < 0 && facingLeft)
+            {
+                FlipAsset();
+            }
         }
     }
 
@@ -144,7 +135,6 @@ public class Player : Character
             anim.ResetTrigger("Damaged");
             anim.SetBool("Death", true);
         }
-
     }
 }
 

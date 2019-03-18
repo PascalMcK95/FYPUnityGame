@@ -112,7 +112,6 @@ public class Enemy : Character
         }
     }
 
-
     private void Respawn()
     {
         count++;
@@ -163,7 +162,6 @@ public class Enemy : Character
                     AttackPlayer();
 
                 }
-                //anim.ResetTrigger("Attack");
             }
         }
         else
@@ -190,7 +188,7 @@ public class Enemy : Character
 
     private void AttackPlayer()
     {
-        Debug.Log("Time since attack" + timeBetweenAttack);
+       // Debug.Log("Time since attack" + timeBetweenAttack);
         if (timeBetweenAttack <= 0)
         {
             Debug.Log("Attacking Player");
@@ -200,8 +198,6 @@ public class Enemy : Character
             playersToDamage = Physics2D.OverlapCircleAll(attackPosition.position, attackRange, whatIsAPlayer);
             if (playersToDamage.Length > 0)
             {
-                //Debug.Log("Enemis in range " + enemiesToDamage.Length);
-
                 for (int i = 0; i < playersToDamage.Length; i++)
                 {
                     if (playersToDamage[i].tag != "Untagged")
@@ -214,7 +210,6 @@ public class Enemy : Character
         }
         else
         {
-            
             timeBetweenAttack -= Time.deltaTime;
         }
     }

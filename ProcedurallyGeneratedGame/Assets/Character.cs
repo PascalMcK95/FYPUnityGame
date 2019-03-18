@@ -68,10 +68,6 @@ public abstract class Character : MonoBehaviour {
     protected void FlipAsset()
     {
         facingLeft = !facingLeft;
-        //theScale = transform.localScale;
-        //theScale.x *= -1;
-        //transform.localScale = theScale;
-        transform.Rotate(0,180,0);
-       
+        transform.Rotate(0,180,0);   
     }
 }
