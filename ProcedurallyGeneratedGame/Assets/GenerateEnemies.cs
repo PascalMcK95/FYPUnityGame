@@ -35,7 +35,18 @@ public class GenerateEnemies : MonoBehaviour
     private void Update()
     {
         enemies = GameObject.FindGameObjectsWithTag("Enemy");
+        CheckEnemies();
         //Debug.Log("***********"+GameObject.FindGameObjectsWithTag("Enemy(Clone)").Length);
+    }
+
+    private void CheckEnemies()
+    {
+        if(enemies.Length == 0)
+        {
+            maxEnemies += 3;
+            SpawnEnemies();
+            Debug.Log("Spawned enemies " + maxEnemies);
+        }
     }
 
     public void SpawnEnemies()

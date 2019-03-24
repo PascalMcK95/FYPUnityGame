@@ -18,6 +18,10 @@ public class Player : Character
     Health healthBar;
     public Score scoreBoard;
 
+    //throwing knife
+    public GameObject throwingKnife;
+    private float timeSinceLastAttack;
+    public int timeBetweenThrowKnife;
 
     void Start()
     {
@@ -46,7 +50,29 @@ public class Player : Character
             Death();
         }
 
+        timeSinceLastAttack -= Time.deltaTime;
+
         base.Update();
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.gameObject.tag == "HealthDrop")
+        {
+            Debug.Log("Health picked up");
+            Destroy(collision.gameObject);
+            healthBar.AddHeart();
+            
+        }
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.tag == "EnemyThrowingKnife")
+        {
+            Debug.Log("hit by knife");
+            this.TakeDamage(damage);
+        }
     }
 
     void FixedUpdate()
@@ -62,6 +88,26 @@ public class Player : Character
         anim.ResetTrigger("Attack");
         anim.SetTrigger("Damaged");
         healthBar.RemoveHeart();
+    }
+
+    private void ThrowKnife()
+    {
+        if(timeSinceLastAttack <= 0)
+        {
+            if (!facingLeft)
+            {
+                Vector2 knifePosition = new Vector2(transform.position.x - 3, transform.position.y + 3);
+                Instantiate(throwingKnife, knifePosition, Quaternion.Euler(new Vector3(0, 0, 90)));
+            }
+            else
+            {
+                Vector2 knifePosition = new Vector2(transform.position.x + 4, transform.position.y + 3);
+                Instantiate(throwingKnife, knifePosition, Quaternion.Euler(new Vector3(0, 180, 90)));
+            }
+            timeSinceLastAttack = timeBetweenThrowKnife;
+        }
+
+        Debug.Log("time " + timeSinceLastAttack);
     }
 
     private void Death()
@@ -128,6 +174,10 @@ public class Player : Character
                         }
                     }
                 }
+            }
+            else if(Input.GetMouseButtonDown(0))
+            {
+                ThrowKnife();
             }
         }
         else

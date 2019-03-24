@@ -30,7 +30,7 @@ public class Health : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-
+        
 	}
 
     private void CheckForDeath()
@@ -41,18 +41,34 @@ public class Health : MonoBehaviour {
 
     public void RemoveHeart()
     {
+        int heartCount =CheckHearts();
+        if(heartCount > 0)
+        {
+            hearts[heartCount - 1].enabled = false;
+        }
+    }
+
+    public void AddHeart()
+    {
+        int heartCount = CheckHearts();
+        if(heartCount < 5)
+        {
+            hearts[heartCount].enabled = true;
+        }
+    }
+
+    private int CheckHearts()
+    {
         int count = 0;
         foreach (var item in hearts)
         {
-            Debug.Log(item.enabled + "^^^^^^^^^^^");
             if (item.enabled)
             {
                 count++;
             }
         }
-        if(count > 0)
-        {
-            hearts[count - 1].enabled = false;
-        }
+        return count;
     }
+
+  
 }

@@ -25,6 +25,7 @@ public class Enemy : Character
    // Vector3 test = new Vector3( 0, 0, 0 );
 
     Vector2 moveEnemy;
+    int chanceOfDrop;
 
     public int min;
     public int max;
@@ -49,13 +50,27 @@ public class Enemy : Character
     private float timeBetweenAttack;
     public float startTimeBetweenAttack;
 
+    // dropping health
+    public GameObject healthDrop;
+    Vector3 dropPosition;
+
+
+    //throwing knife
+    public GameObject throwingKnife;
+    private float timeSinceLastAttack;
+    public float timeBetweenThrowKnife;
+    //RaycastHit2D hitLeft;
+    //RaycastHit2D hitRight;
+
     void Start()
     {
         timeBetweenAttack = startTimeBetweenAttack;
         dead = false;
         playerDead = false;
         moveEnemy = new Vector2();
+       
         base.Start();
+        //anim.SetBool("Death",false);
         //CheckSpawnPosition();
        // CheckForCollisons();
     }
@@ -93,15 +108,23 @@ public class Enemy : Character
 
     private void Death()
     {
-        dead = true;
-
-        anim.ResetTrigger("Idle");
-        anim.ResetTrigger("Run");
-        anim.ResetTrigger("Attack");
-        anim.ResetTrigger("Damaged");
         anim.SetBool("Death", true);
+        dropPosition = transform.position;
         Destroy(this.gameObject, 3);
+        DropHealth();
+        dead = true;
         Debug.Log("Enemy died");
+    }
+
+    private void DropHealth()
+    {
+         chanceOfDrop = UnityEngine.Random.Range(1, 4);
+         Debug.Log(chanceOfDrop + " drop chance");
+
+        if(chanceOfDrop == 1)
+        {
+            Instantiate(healthDrop, dropPosition, Quaternion.identity);
+        }
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -109,6 +132,15 @@ public class Enemy : Character
         if (collision.gameObject.tag == "Player")
         {
             detected = true;
+        }
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.tag == "ThrowingKnife")
+        {
+            Debug.Log("hit by knife");
+            this.TakeDamage(damage);
         }
     }
 
@@ -135,6 +167,29 @@ public class Enemy : Character
         }
     }
 
+    private void ThrowKnife()
+    {
+        if (timeBetweenThrowKnife <= 0)
+        {
+            if (facingLeft)
+            {
+                Debug.Log("Enemy throwing left");
+                Vector2 knifePosition = new Vector2(transform.position.x - 3, transform.position.y + 3);
+                Instantiate(throwingKnife, knifePosition, Quaternion.Euler(new Vector3(0, 0, 90)));
+            }
+            else
+            {
+                Debug.Log("Enemy throwing right " + transform.position.y + " " + (transform.position.y  +20));
+                Vector2 knifePosition = new Vector2(transform.position.x + 5, (transform.position.y + 20));
+                Instantiate(throwingKnife, transform.position, Quaternion.Euler(new Vector3(0, 180, 90)));
+            }
+            timeBetweenThrowKnife = 4;
+        }
+        timeBetweenThrowKnife -= Time.deltaTime;
+
+        //Debug.Log("time " + timeBetweenThrowKnife);
+    }
+
 
     protected void MoveTowardsPlayer()
     {
@@ -156,11 +211,49 @@ public class Enemy : Character
                     anim.ResetTrigger("Attack");
                     transform.position = Vector3.MoveTowards(position, playerPosition, speed / 20);
                     anim.SetTrigger("Run");
+
+                    Vector2 left = new Vector2(transform.position.x - 5, transform.position.y + 5);
+                    Vector2 right = new Vector2(transform.position.x + 5, transform.position.y + 5);
+
+                    Debug.DrawRay(left, Vector2.left * 50f, Color.green);
+                    Debug.DrawRay(right, Vector2.right * 50f, Color.red);
+
+                    if (Vector3.Distance(position, playerPosition) >= 6f)
+                    {
+                        RaycastHit2D []  hitLeft = Physics2D.RaycastAll(left, Vector2.left * 50f);
+                        RaycastHit2D[] hitRight = Physics2D.RaycastAll(right, Vector2.right * 50f);
+
+                        if (hitLeft != null)
+                        {
+                            for (int i = 0; i < hitLeft.Length; i++)
+                            {
+                                if(hitLeft[i].rigidbody!= null)
+                                {
+                                    if (hitLeft[i].rigidbody.tag == "Player")
+                                    {
+                                        ThrowKnife();
+                                    }
+                                }
+                            }
+                        }
+                        if(hitRight!= null)
+                        {
+                            for (int i = 0; i < hitRight.Length; i++)
+                            {
+                                if (hitRight[i].rigidbody != null)
+                                {
+                                    if (hitRight[i].rigidbody.tag == "Player")
+                                    {
+                                        ThrowKnife();
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
                 else if (Vector3.Distance(position, playerPosition) <= 4f)
                 {
                     AttackPlayer();
-
                 }
             }
         }
@@ -168,7 +261,6 @@ public class Enemy : Character
         {
             anim.ResetTrigger("Run");
             anim.ResetTrigger("Attack");
-            anim.ResetTrigger("Death");
             anim.ResetTrigger("Damaged");
             anim.SetTrigger("Idle");
         }
@@ -213,10 +305,6 @@ public class Enemy : Character
         {
             timeBetweenAttack -= Time.deltaTime;
         }
-        //if(timeBetweenAttack >= 2)
-        //{
-        //    anim.ResetTrigger("Attack");
-        //}
     }
 
     private void CheckIfFacingRightDirection()
@@ -235,20 +323,7 @@ public class Enemy : Character
     {
         health -= damage;
         anim.SetTrigger("Damaged");
-       // WaitForAnimationToFinish("Damaged");
-        Debug.Log("Damage taken " + damage + " health remaining " + health);
     }
-
-    //private void WaitForAnimationToFinish(string animation)
-    //{
-    //    if (this.anim.GetCurrentAnimatorStateInfo(0).IsName(animation))
-    //    {
-    //        Debug.Log("Animation finished");
-    //        anim.ResetTrigger(animation);
-    //    }
-    //}
-
-
 
     //private void CheckOutsideSpawn()
     //{
@@ -338,11 +413,6 @@ public class Enemy : Character
             //Debug.Log("need to move left");
             moveEnemy.x += -10;
         }
-        // Debug.Log("moving enemy " + moveEnemy.x + " " + moveEnemy.y);
-        // 
-
-        //    MoveEnemy(moveEnemy);
-        //   // Debug.Log("Enemy Moved ******* " + moveEnemy.x + " " + moveEnemy.y);
     }
 
 
