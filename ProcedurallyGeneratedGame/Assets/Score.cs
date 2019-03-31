@@ -8,12 +8,13 @@ public class Score : MonoBehaviour {
 
     float timer = 0.0f;
     int time = 0;
-    int score = 0;
+    public int score = 0;
     public Text scoreText;
     public Player player;
-
     float startTime;
     int timePassed;
+
+   
 
     private void Start()
     {
@@ -25,7 +26,9 @@ public class Score : MonoBehaviour {
         {
             time = Convert.ToInt32(Time.time - startTime);
             scoreText.text = (time + score).ToString();
+
         }
+
     }
 
     public void AddDamageToScore()

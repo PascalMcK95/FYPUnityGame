@@ -23,8 +23,13 @@ public class Player : Character
     private float timeSinceLastAttack;
     public int timeBetweenThrowKnife;
 
+    public static string finalScore;
+
+
+    LoadSceneOnClick loadScene;
     void Start()
     {
+        loadScene = new LoadSceneOnClick();
         healthBar = gameObject.GetComponent<Health>();
         //scoreBoard = gameObject.GetComponent<Score>();
         dead = false;
@@ -62,6 +67,7 @@ public class Player : Character
             Debug.Log("Health picked up");
             Destroy(collision.gameObject);
             healthBar.AddHeart();
+            health += 10;
             
         }
     }
@@ -119,9 +125,9 @@ public class Player : Character
         anim.ResetTrigger("Attack");
         anim.ResetTrigger("Damaged");
         anim.SetBool("Death", true);
-        Destroy(this.gameObject, 2);
-
-        //Debug.Log("Player Died");
+        // Destroy(this.gameObject, 2);
+        finalScore = scoreBoard.scoreText.text;
+        loadScene.LoadSceneByIndex(2);
     }
 
     private void CheckDirection()

@@ -174,12 +174,12 @@ public class Enemy : Character
             if (facingLeft)
             {
                 Debug.Log("Enemy throwing left");
-                Vector2 knifePosition = new Vector2(transform.position.x - 3, transform.position.y + 3);
+                Vector2 knifePosition = new Vector2(transform.position.x - 3, transform.position.y + 8);
                 Instantiate(throwingKnife, knifePosition, Quaternion.Euler(new Vector3(0, 0, 90)));
             }
             else
             {
-                Debug.Log("Enemy throwing right " + transform.position.y + " " + (transform.position.y  +20));
+                Debug.Log("Enemy throwing right " + transform.position.y + " " + (transform.position.y  +8));
                 Vector2 knifePosition = new Vector2(transform.position.x + 5, (transform.position.y + 20));
                 Instantiate(throwingKnife, transform.position, Quaternion.Euler(new Vector3(0, 180, 90)));
             }
