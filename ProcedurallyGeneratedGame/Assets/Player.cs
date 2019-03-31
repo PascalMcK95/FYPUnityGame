@@ -24,7 +24,7 @@ public class Player : Character
     public int timeBetweenThrowKnife;
 
     public static string finalScore;
-
+    float attackReset;
 
     LoadSceneOnClick loadScene;
     void Start()
@@ -91,7 +91,8 @@ public class Player : Character
         health -= damage;
         anim.ResetTrigger("Idle");
         anim.ResetTrigger("Run");
-        anim.ResetTrigger("Attack");
+        // anim.ResetTrigger("Attack");
+        anim.SetBool("Attack", false);
         anim.SetTrigger("Damaged");
         healthBar.RemoveHeart();
     }
@@ -122,7 +123,8 @@ public class Player : Character
 
         anim.ResetTrigger("Idle");
         anim.ResetTrigger("Run");
-        anim.ResetTrigger("Attack");
+        //anim.ResetTrigger("Attack");
+        anim.SetBool("Attack", false);
         anim.ResetTrigger("Damaged");
         anim.SetBool("Death", true);
         // Destroy(this.gameObject, 2);
@@ -149,7 +151,8 @@ public class Player : Character
 
     void Animate()
     {
-        if(dead == false)
+        //anim.SetBool("Attack", false);
+        if (dead == false)
         {
             if (Input.GetAxisRaw("Horizontal") != 0 || Input.GetAxisRaw("Vertical") != 0)
             {
@@ -167,7 +170,9 @@ public class Player : Character
                 anim.ResetTrigger("Idle");
                 anim.ResetTrigger("Run");
                 //Debug.Log("Attacking");
-                anim.SetTrigger("Attack");
+                //anim.SetTrigger("Attack");
+                anim.SetBool("Attack", true);
+                attackReset = 1.0f;
                 enemiesToDamage = Physics2D.OverlapCircleAll(attackPosition.position, attackRange, whatIsAnEnemy);
                 if (enemiesToDamage.Length > 0)
                 {
@@ -180,6 +185,7 @@ public class Player : Character
                         }
                     }
                 }
+                
             }
             else if(Input.GetMouseButtonDown(0))
             {
@@ -189,11 +195,20 @@ public class Player : Character
         else
         {
             anim.ResetTrigger("Run");
-            anim.ResetTrigger("Attack");
+            // anim.ResetTrigger("Attack");
+            anim.SetBool("Attack",false);
             //anim.ResetTrigger("Death");
             anim.ResetTrigger("Idle");
             anim.ResetTrigger("Damaged");
             anim.SetBool("Death", true);
+        }
+
+        if(attackReset >= 0)
+        {
+            attackReset -= Time.deltaTime;
+        }
+        else{
+            anim.SetBool("Attack", false);
         }
     }
 }
