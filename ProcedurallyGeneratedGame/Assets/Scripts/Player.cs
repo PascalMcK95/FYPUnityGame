@@ -172,7 +172,7 @@ public class Player : Character
                 //Debug.Log("Attacking");
                 //anim.SetTrigger("Attack");
                 anim.SetBool("Attack", true);
-                attackReset = 1.0f;
+                attackReset = 1.1f;
                 enemiesToDamage = Physics2D.OverlapCircleAll(attackPosition.position, attackRange, whatIsAnEnemy);
                 if (enemiesToDamage.Length > 0)
                 {

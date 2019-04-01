@@ -70,9 +70,24 @@ public class Enemy : Character
         moveEnemy = new Vector2();
        
         base.Start();
-        //anim.SetBool("Death",false);
+
         //CheckSpawnPosition();
-       // CheckForCollisons();
+       CheckForCollisions();
+    }
+
+    private void CheckForCollisions()
+    {
+        var hitColliders = Physics2D.OverlapCircleAll(attackPosition.position, 5);
+
+        foreach (var collider in hitColliders)
+        {
+            if(collider.tag == "CaveMesh")
+            {
+                Debug.Log("touching walls need to repsawn");
+                Respawn();
+                //CheckForCollisions();
+            }
+        }
     }
 
     void Update()
@@ -82,7 +97,7 @@ public class Enemy : Character
         //CheckSpawnPosition();
         if(health > 0)
         {
-            MoveTowardsPlayer();
+          //  MoveTowardsPlayer();
         }
      
 
@@ -97,6 +112,9 @@ public class Enemy : Character
     {
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(attackPosition.position, attackRange);
+        // collider check
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireSphere(transform.position, 5);
     }  
 
     private void MoveEnemy(Vector2 moveEnemy)
@@ -151,10 +169,51 @@ public class Enemy : Character
         randomX = UnityEngine.Random.Range(min, max);
 
         position = new Vector2(randomX, randomY);
-        transform.Translate(position);
+        transform.SetPositionAndRotation(position,Quaternion.identity);
         Debug.Log(randomX + " " + randomY + " Respawn " + count);
-        //CheckSpawnPosition();
-       // CheckForCollisons();
+       // CheckOutsideMap();
+       // CheckSpawnPosition();
+        CheckForCollisions();
+    }
+
+    private void CheckOutsideMap()
+    {
+        directionCheck = Vector2.down;
+        position = transform.position;
+        float distance = 1000;
+
+        hit = Physics2D.Raycast(position, directionCheck, distance, caveLayer);
+        // Debug.DrawLine(position, directionCheck);
+        if (hit.collider == null)
+        {
+            Debug.Log("outside down");
+            Respawn();
+        }
+        directionCheck = Vector2.up;
+        hit = Physics2D.Raycast(position, directionCheck, distance, caveLayer);
+        // Debug.DrawLine(position, directionCheck);
+        if (hit.collider == null)
+        {
+            Debug.Log("outside up");
+            Respawn();
+        }
+        directionCheck = Vector2.left;
+        hit = Physics2D.Raycast(position, directionCheck, distance, caveLayer);
+        // Debug.DrawLine(position, directionCheck);
+        if (hit.collider == null)
+        {
+            Debug.Log("outside left");
+            Respawn();
+        }
+        directionCheck = Vector2.right;
+        hit = Physics2D.Raycast(position, directionCheck, distance, caveLayer);
+        // Debug.DrawLine(position, directionCheck);
+        if (hit.collider == null)
+        {
+            Debug.Log("outside right");
+            Respawn();
+        }
+
     }
 
     private void OnTriggerExit2D(Collider2D collision)
@@ -374,45 +433,51 @@ public class Enemy : Character
         float distance = 10;
 
         hit = Physics2D.Raycast(position, directionCheck, distance, caveLayer);
+       // Debug.DrawLine(position, directionCheck);
         if (hit.collider != null)
         {
             Debug.Log(hit.distance + " down green");
-            // Debug.DrawRay(transform.position, Vector2.down * 15, Color.green,20);
+             Debug.DrawRay(transform.position, Vector2.down * 15, Color.green,20);
             //  Debug.Log("need to move up");
-            moveEnemy.y += 15;
-            // Respawn();
+           // moveEnemy.y += 15;
+             Respawn();
         }
 
         directionCheck = Vector2.up;
         hit = Physics2D.Raycast(position, directionCheck, distance, caveLayer);
+       // Debug.DrawLine(position, directionCheck);
         if (hit.collider != null)
         {
             Debug.Log(hit.distance + " up red");
 
-            // Debug.DrawRay(transform.position, Vector2.up*15, Color.red,20);
-            //Respawn();
-            moveEnemy.y += -10;
+             Debug.DrawRay(transform.position, Vector2.up*15, Color.red,20);
+            Respawn();
+          //  moveEnemy.y += -10;
         }
         directionCheck = Vector2.left;
         hit = Physics2D.Raycast(position, directionCheck, distance, caveLayer);
+       // Debug.DrawLine(position, directionCheck);
         if (hit.collider != null)
         {
             Debug.Log(hit.distance + " left blue");
-            //Debug.DrawRay(transform.position, Vector2.left * 15, Color.blue,20);
-            //Respawn();
+            Debug.DrawRay(transform.position, Vector2.left * 15, Color.blue,20);
+            Respawn();
             //  Debug.Log("need to move right");
-            moveEnemy.x += 15;
+           // moveEnemy.x += 15;
         }
         directionCheck = Vector2.right;
         hit = Physics2D.Raycast(position, directionCheck, distance, caveLayer);
+       // Debug.DrawLine(position, directionCheck);
         if (hit.collider != null)
         {
             Debug.Log(hit.distance + " right yellow");
-            //Debug.DrawRay(transform.position, Vector2.right * 15, Color.yellow,20);
-            //Respawn();
+            Debug.DrawRay(transform.position, Vector2.right * 15, Color.yellow,20);
+            Respawn();
             //Debug.Log("need to move left");
-            moveEnemy.x += -10;
+           // moveEnemy.x += -10;
         }
+
+       // CheckSpawnPosition();
     }
 
 
