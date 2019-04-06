@@ -8,23 +8,29 @@ public class ThrowKnife : MonoBehaviour {
     public float speed;
     //public float range;
     private Rigidbody2D rigidBody;
-    private Vector2 direction;
+    private Vector3 direction;
     GameObject player;
     private float startTime = 3;
+    Camera camera;
     //Vector2 playerDirection;
     // Use this for initialization
     void Start () {
         //scoreBoard = new Score();
+        camera = Camera.main;
         rigidBody = GetComponent<Rigidbody2D>();
         player = GameObject.FindGameObjectWithTag("Player");
-        if (player.transform.rotation.y > 0)
-        {
-            direction = Vector2.right;
-        }
-        else
-        {
-            direction = Vector2.left;
-        }
+        //if (player.transform.rotation.y > 0)
+        //{
+        //    direction = Vector2.right;
+        //}
+        //else
+        //{
+        //    direction = Vector2.left;
+        //}
+
+        direction = camera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, camera.nearClipPlane));
+        //direction = Input.mousePosition;
+       // transform.rotation = Quaternion.LookRotation(direction);
     }
 	
 	// Update is called once per frame
@@ -42,7 +48,8 @@ public class ThrowKnife : MonoBehaviour {
 
     private void FixedUpdate()
     {
-        rigidBody.velocity = direction * speed;
+       //rigidBody.velocity = direction * speed;
+       transform.position = Vector3.MoveTowards(transform.position, direction, speed / 10);
     }
 
     private void OnBecameInvisible()
