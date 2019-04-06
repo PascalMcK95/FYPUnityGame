@@ -131,9 +131,12 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System;
+using UnityEngine.AI;
 
 public class MapGenerator : MonoBehaviour
 {
+
+    //public NavMeshSurface navMesh;
 
     public int width;
     public int height;
@@ -149,6 +152,10 @@ public class MapGenerator : MonoBehaviour
     void Start()
     {
         GenerateMap();
+
+        //update navmesh
+        //navMesh.BuildNavMesh();
+
     }
 
     void Update()
@@ -156,6 +163,7 @@ public class MapGenerator : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.R))
         {
             GenerateMap();
+            //navMesh.BuildNavMesh();
         }
     }
 

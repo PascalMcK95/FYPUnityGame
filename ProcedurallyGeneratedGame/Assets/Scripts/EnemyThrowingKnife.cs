@@ -63,6 +63,16 @@ public class EnemyThrowingKnife : MonoBehaviour {
             Debug.Log("Enemy knife hit palyer");
             Destroy(this.gameObject);
         }
+
+        else if (collision.gameObject.tag == "CaveMesh")
+        {
+            Destroy(this.gameObject);
+        }
+
+        else if (collision.gameObject.tag == "Enemy")
+        {
+            Destroy(this.gameObject);
+        }
     }
 }
 

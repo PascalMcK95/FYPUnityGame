@@ -81,10 +81,6 @@ public class Player : Character
         }
     }
 
-    void FixedUpdate()
-    {
-     
-    }
 
     public void TakeDamage(int damage)
     {
@@ -168,6 +164,7 @@ public class Player : Character
             if (Input.GetMouseButtonDown(1) || Input.GetKeyDown("space"))
             {
                 anim.ResetTrigger("Idle");
+                anim.ResetTrigger("Damaged");
                 anim.ResetTrigger("Run");
                 //Debug.Log("Attacking");
                 //anim.SetTrigger("Attack");

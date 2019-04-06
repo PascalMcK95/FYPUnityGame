@@ -38,7 +38,7 @@ public abstract class Character : MonoBehaviour {
     {
         if (anim.GetBool("Attack") == false)
         {
-            rigidbody.MovePosition(rigidbody.position + direction * Time.fixedDeltaTime);
+            rigidbody.MovePosition(rigidbody.position + direction * Time.fixedDeltaTime * speed);
         }
         else
         {

@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class ThrowKnife : MonoBehaviour {
 
+    public Score scoreBoard;
     public float speed;
     //public float range;
     private Rigidbody2D rigidBody;
@@ -13,6 +14,7 @@ public class ThrowKnife : MonoBehaviour {
     //Vector2 playerDirection;
     // Use this for initialization
     void Start () {
+        //scoreBoard = new Score();
         rigidBody = GetComponent<Rigidbody2D>();
         player = GameObject.FindGameObjectWithTag("Player");
         if (player.transform.rotation.y > 0)
@@ -54,6 +56,12 @@ public class ThrowKnife : MonoBehaviour {
         if (collision.gameObject.tag == "Enemy")
         {
             Debug.Log("Enemy Hit");
+            Destroy(this.gameObject);
+            scoreBoard.AddDamageToScore();
+        }
+
+        if (collision.gameObject.tag == "CaveMesh")
+        {
             Destroy(this.gameObject);
         }
     }

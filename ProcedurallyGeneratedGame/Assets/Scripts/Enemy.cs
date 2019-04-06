@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class Enemy : Character
 {
@@ -17,14 +18,9 @@ public class Enemy : Character
 
     Collider2D enemyCollider;
     MeshCollider meshCollider;
-    //private bool alreadySpawned= false;
     GenerateEnemies enemyGen;
-   // Vector2 position;
     Vector2 directionCheck;
-    // public Enemy newEnemy;
-   // Vector3 test = new Vector3( 0, 0, 0 );
 
-    //Vector2 moveEnemy;
     int chanceOfDrop;
 
     public int min;
@@ -59,41 +55,49 @@ public class Enemy : Character
     public GameObject throwingKnife;
     private float timeSinceLastAttack;
     public float timeBetweenThrowKnife;
-    //RaycastHit2D hitLeft;
-    //RaycastHit2D hitRight;
+
+    RaycastHit2D [] walk;
+    bool lineOfSight = false;
+
+
+    //navmesh
+    public NavMeshAgent agent;
 
     void Start()
     {
+      //  agent = gameObject.GetComponentInChildren<NavMeshAgent>();
         timeBetweenAttack = startTimeBetweenAttack;
         dead = false;
         playerDead = false;
-       // moveEnemy = new Vector2();
+
+        //stops rotation when agent is added
+        agent.updateUpAxis = false;
+        agent.updateRotation = false;
+
+
+        //resets z position to 0;
+        var newPosition = transform.position;
+        newPosition.z = 0;
+        transform.position = newPosition;
        
-        base.Start();
+   
+
+           base.Start();
 
         //CheckSpawnPosition();
        CheckForCollisions();
     }
 
-    private void CheckForCollisions()
-    {
-        var hitColliders = Physics2D.OverlapCircleAll(attackPosition.position, 6);
-
-        foreach (var collider in hitColliders)
-        {
-            if(collider.tag == "CaveMesh")
-            {
-                Debug.Log("touching walls need to repsawn");
-                Respawn();
-            }
-        }
-    }
-
     void Update()
     {
         position = transform.position;
+        playerPosition = GameObject.FindGameObjectWithTag("Player").transform.position;
 
-        if(health > 0)
+        var newPosition = transform.position;
+        newPosition.z = 0;
+        transform.position = newPosition;
+
+        if (health > 0)
         {
             MoveTowardsPlayer();
         }
@@ -102,6 +106,29 @@ public class Enemy : Character
         {
             Death();
         }
+
+        //navmesh
+        if(detected == true)
+        {
+            agent.SetDestination(playerPosition);
+            anim.SetTrigger("Run");
+            //transform.position = agent.transform.localPosition;
+           // agent.transform.localPosition.
+        }
+    }
+
+    private void CheckForCollisions()
+    {
+        var hitColliders = Physics2D.OverlapCircleAll(attackPosition.position, 6);
+
+        foreach (var collider in hitColliders)
+        {
+            if (collider.tag == "CaveMesh")
+            {
+                Debug.Log("touching walls need to repsawn");
+                Respawn();
+            }
+        }
     }
 
     // attack range sphere
@@ -109,6 +136,9 @@ public class Enemy : Character
     {
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(attackPosition.position, attackRange);
+
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawLine(transform.position, playerPosition);
         // collider check
         //Gizmos.color = Color.green;
         //Gizmos.DrawWireSphere(transform.position, 5);
@@ -126,7 +156,7 @@ public class Enemy : Character
 
     private void DropHealth()
     {
-         chanceOfDrop = UnityEngine.Random.Range(1, 4);
+         chanceOfDrop = UnityEngine.Random.Range(1, 6);
          Debug.Log(chanceOfDrop + " drop chance");
 
         if(chanceOfDrop == 1)
@@ -209,7 +239,7 @@ public class Enemy : Character
             {
                 position = transform.position;
                 enemyDirection = transform.localScale;
-                playerPosition = GameObject.FindGameObjectWithTag("Player").transform.position;
+              
                 CheckIfFacingRightDirection();
                 anim.ResetTrigger("Run");
                 anim.ResetTrigger("Attack");
@@ -219,7 +249,7 @@ public class Enemy : Character
                 {
                     anim.ResetTrigger("Attack");
 
-                    WalkToPlayer();
+                   // WalkToPlayer();
 
                     Vector2 left = new Vector2(transform.position.x - 5, transform.position.y + 5);
                     Vector2 right = new Vector2(transform.position.x + 5, transform.position.y + 5);
@@ -277,7 +307,28 @@ public class Enemy : Character
 
     private void WalkToPlayer()
     {
-        transform.position = Vector3.MoveTowards(position, playerPosition, speed / 20);
+        //walk = Physics2D.RaycastAll(transform.position, playerPosition);
+
+        //for (int i = 0; i < walk.Length && lineOfSight == false;i++)
+        //{
+        //    if(walk[i].collider.tag == "CaveMesh")
+        //    {
+        //        Debug.Log("indirect Line of sight");
+        //    }
+        //}
+
+        //RaycastHit check;
+        //if(Physics.Linecast(transform.position, playerPosition, out check))
+        //{
+        //    if(check.transform.tag == "CaveMesh")
+        //    {
+        //        Debug.Log("indirect Line of sight");
+        //    }
+        //}
+
+
+
+        transform.position = Vector3.MoveTowards(position, playerPosition, speed /5);
         anim.SetTrigger("Run");
     }
 
