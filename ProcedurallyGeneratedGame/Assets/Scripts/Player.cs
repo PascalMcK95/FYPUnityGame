@@ -42,6 +42,9 @@ public class Player : Character
     {
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(attackPosition.position, attackRange);
+        Gizmos.color = Color.green;
+        var poos = new Vector3(transform.position.x, transform.position.y+4, transform.position.z);
+        Gizmos.DrawCube(poos, new Vector3(20, 10, 5));
     }
 
     protected override void Update()

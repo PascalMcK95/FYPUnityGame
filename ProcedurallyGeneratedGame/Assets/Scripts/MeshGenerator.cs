@@ -3,9 +3,11 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.AI;
 
 public class MeshGenerator : MonoBehaviour
 {
+    public NavMeshSurface navMesh;
 
     public SquareGrid squareGrid;
     public MeshFilter walls;
@@ -62,6 +64,8 @@ public class MeshGenerator : MonoBehaviour
         {
             Generate2DColliders();
         }
+
+      //  navMesh.BuildNavMesh();
         //else
         //{
         //    CreateWallMesh();

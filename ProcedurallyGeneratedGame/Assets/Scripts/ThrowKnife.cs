@@ -57,7 +57,7 @@ public class ThrowKnife : MonoBehaviour {
         {
             Debug.Log("Enemy Hit");
             Destroy(this.gameObject);
-            scoreBoard.AddDamageToScore();
+           // scoreBoard.AddDamageToScore();
         }
 
         if (collision.gameObject.tag == "CaveMesh")

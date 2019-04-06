@@ -9,6 +9,7 @@ public class Enemy : Character
     Vector3 enemyDirection;
    Vector3 position;
     Vector3 playerPosition;
+    Vector3 newPosition;
     bool detected = false;
     public float sphereRadius;
     int count = 0;
@@ -21,7 +22,7 @@ public class Enemy : Character
     GenerateEnemies enemyGen;
     Vector2 directionCheck;
 
-    int chanceOfDrop;
+    public int chanceOfDrop;
 
     public int min;
     public int max;
@@ -63,9 +64,15 @@ public class Enemy : Character
     //navmesh
     public NavMeshAgent agent;
 
+    Vector2 hright;
+    Vector2 hleft;
+    //GameObject player1;
+    Vector3 rayPosition;
+    Vector3 playerRayPosition;
+
     void Start()
     {
-      //  agent = gameObject.GetComponentInChildren<NavMeshAgent>();
+       
         timeBetweenAttack = startTimeBetweenAttack;
         dead = false;
         playerDead = false;
@@ -80,18 +87,19 @@ public class Enemy : Character
         newPosition.z = 0;
         transform.position = newPosition;
        
-   
-
-           base.Start();
-
-        //CheckSpawnPosition();
+       base.Start();
        CheckForCollisions();
     }
 
     void Update()
     {
+        rayPosition = new Vector3(transform.position.x, transform.position.y + 4, transform.position.z);
         position = transform.position;
         playerPosition = GameObject.FindGameObjectWithTag("Player").transform.position;
+        playerRayPosition = new Vector3(playerPosition.x, playerPosition.y + 4, playerPosition.z);
+
+        hleft = new Vector2(playerPosition.x - 30, playerPosition.y);
+        hright = new Vector2(playerPosition.x + 30, playerPosition.y);
 
         var newPosition = transform.position;
         newPosition.z = 0;
@@ -105,15 +113,6 @@ public class Enemy : Character
         if (health <= 0 && dead == false)
         {
             Death();
-        }
-
-        //navmesh
-        if(detected == true)
-        {
-            agent.SetDestination(playerPosition);
-            anim.SetTrigger("Run");
-            //transform.position = agent.transform.localPosition;
-           // agent.transform.localPosition.
         }
     }
 
@@ -132,16 +131,18 @@ public class Enemy : Character
     }
 
     // attack range sphere
-    private void OnDrawGizmosSelected()
+    private void OnDrawGizmos()
     {
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(attackPosition.position, attackRange);
-
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawLine(transform.position, playerPosition);
-        // collider check
-        //Gizmos.color = Color.green;
-        //Gizmos.DrawWireSphere(transform.position, 5);
+        //attack radius
+        //Gizmos.color = Color.red;
+        //Gizmos.DrawWireSphere(attackPosition.position, attackRange);
+        // line of sight
+        Gizmos.color = Color.green;
+        Gizmos.DrawLine(rayPosition, playerRayPosition);
+        // blocking object
+        Gizmos.color = Color.blue;
+        Gizmos.DrawLine(hleft, rayPosition);
+        Gizmos.DrawLine(hright, rayPosition);
     }  
 
     private void Death()
@@ -156,7 +157,7 @@ public class Enemy : Character
 
     private void DropHealth()
     {
-         chanceOfDrop = UnityEngine.Random.Range(1, 6);
+         chanceOfDrop = UnityEngine.Random.Range(1, chanceOfDrop);
          Debug.Log(chanceOfDrop + " drop chance");
 
         if(chanceOfDrop == 1)
@@ -177,7 +178,7 @@ public class Enemy : Character
     {
         if (collision.gameObject.tag == "ThrowingKnife")
         {
-            Debug.Log("hit by knife");
+           // Debug.Log("hit by knife");
             this.TakeDamage(damage);
         }
     }
@@ -190,9 +191,7 @@ public class Enemy : Character
 
         position = new Vector2(randomX, randomY);
         transform.SetPositionAndRotation(position,Quaternion.identity);
-        Debug.Log(randomX + " " + randomY + " Respawn " + count);
-       // CheckOutsideMap();
-       // CheckSpawnPosition();
+       // Debug.Log(randomX + " " + randomY + " Respawn " + count);
         CheckForCollisions();
     }
 
@@ -212,17 +211,17 @@ public class Enemy : Character
         {
             if (facingLeft)
             {
-                Debug.Log("Enemy throwing left");
-                Vector2 knifePosition = new Vector2(transform.position.x - 3, transform.position.y + 5);
+                //Debug.Log("Enemy throwing left");
+                Vector2 knifePosition = new Vector2(transform.position.x - 5, transform.position.y + 5);
                 Instantiate(throwingKnife, knifePosition, Quaternion.Euler(new Vector3(0, 0, 90)));
             }
             else
             {
-                Debug.Log("Enemy throwing right " + transform.position.y + " " + (transform.position.y  +8));
+               // Debug.Log("Enemy throwing right " + transform.position.y + " " + (transform.position.y  +8));
                 Vector2 knifePosition = new Vector2(transform.position.x + 5, transform.position.y + 5);
                 Instantiate(throwingKnife, knifePosition, Quaternion.Euler(new Vector3(0, 180, 90)));
             }
-            timeBetweenThrowKnife = 4;
+            timeBetweenThrowKnife = 2;
         }
         timeBetweenThrowKnife -= Time.deltaTime;
 
@@ -239,6 +238,7 @@ public class Enemy : Character
             {
                 position = transform.position;
                 enemyDirection = transform.localScale;
+                //CheckLineOfSight();
               
                 CheckIfFacingRightDirection();
                 anim.ResetTrigger("Run");
@@ -249,7 +249,7 @@ public class Enemy : Character
                 {
                     anim.ResetTrigger("Attack");
 
-                   // WalkToPlayer();
+                    WalkToPlayer();
 
                     Vector2 left = new Vector2(transform.position.x - 5, transform.position.y + 5);
                     Vector2 right = new Vector2(transform.position.x + 5, transform.position.y + 5);
@@ -305,31 +305,43 @@ public class Enemy : Character
         }
     }
 
+   
+
     private void WalkToPlayer()
     {
-        //walk = Physics2D.RaycastAll(transform.position, playerPosition);
+      
+        RaycastHit2D hits;
+        hits = Physics2D.Linecast(rayPosition, playerRayPosition, caveLayer);
+        if(hits.collider == null)
+        {
+            transform.position = Vector3.MoveTowards(position, playerPosition, speed /10);
+            anim.SetTrigger("Run");
+        }
+        else{
+            MoveAroundObject();
+            anim.ResetTrigger("Run");
+        
+        }
+    }
 
-        //for (int i = 0; i < walk.Length && lineOfSight == false;i++)
-        //{
-        //    if(walk[i].collider.tag == "CaveMesh")
-        //    {
-        //        Debug.Log("indirect Line of sight");
-        //    }
-        //}
+    private void MoveAroundObject()
+    {
+        // ray from centre of enemy
+        //rayPosition = new Vector3(transform.position.x, transform.position.y + 2, transform.position.z);
+        RaycastHit2D rayLeft;
+        rayLeft = Physics2D.Linecast(hleft, rayPosition, caveLayer);
 
-        //RaycastHit check;
-        //if(Physics.Linecast(transform.position, playerPosition, out check))
-        //{
-        //    if(check.transform.tag == "CaveMesh")
-        //    {
-        //        Debug.Log("indirect Line of sight");
-        //    }
-        //}
+        RaycastHit2D rayRight;
+        rayRight = Physics2D.Linecast(hright, rayPosition, caveLayer);
+        if (rayLeft.collider == null)
+        {
+            transform.position = Vector3.MoveTowards(transform.position, hleft, speed / 10);
+        }
+        else if (rayLeft.collider != null && rayRight.collider == null)
+        {
+            transform.position = Vector3.MoveTowards(transform.position, hright, speed / 10);
+        }
 
-
-
-        transform.position = Vector3.MoveTowards(position, playerPosition, speed /5);
-        anim.SetTrigger("Run");
     }
 
     private void CheckIfPlayerAlive()

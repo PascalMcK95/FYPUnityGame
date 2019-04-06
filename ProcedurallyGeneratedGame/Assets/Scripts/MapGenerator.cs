@@ -136,7 +136,7 @@ using UnityEngine.AI;
 public class MapGenerator : MonoBehaviour
 {
 
-    //public NavMeshSurface navMesh;
+    public NavMeshSurface navMesh;
 
     public int width;
     public int height;
@@ -145,7 +145,7 @@ public class MapGenerator : MonoBehaviour
     public bool useRandomSeed;
 
     [Range(0, 100)]
-    public int randomFillPercent;
+    public int fillPercent;
 
     int[,] map;
 
@@ -154,7 +154,7 @@ public class MapGenerator : MonoBehaviour
         GenerateMap();
 
         //update navmesh
-        //navMesh.BuildNavMesh();
+       // navMesh.BuildNavMesh();
 
     }
 
@@ -163,7 +163,7 @@ public class MapGenerator : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.R))
         {
             GenerateMap();
-            //navMesh.BuildNavMesh();
+           navMesh.BuildNavMesh();
         }
     }
 
@@ -509,7 +509,7 @@ public class MapGenerator : MonoBehaviour
                 }
                 else
                 {
-                    map[x, y] = (pseudoRandom.Next(0, 100) < randomFillPercent) ? 1 : 0;
+                    map[x, y] = (pseudoRandom.Next(0, 100) < fillPercent) ? 1 : 0;
                 }
             }
         }

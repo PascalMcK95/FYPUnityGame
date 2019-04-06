@@ -60,6 +60,7 @@ public class GenerateEnemies : MonoBehaviour
             position = new Vector2(randomX, randomY);
             Instantiate(enemy, position, Quaternion.identity);
             enemies = GameObject.FindGameObjectsWithTag("Enemy");
+            
             //totalEnemies.Add(enemy);
         }
         //GameObject SpawnLocation = Instantiate(enemies, position, Quaternion.identity);
