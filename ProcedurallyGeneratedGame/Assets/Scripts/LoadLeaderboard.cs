@@ -32,11 +32,6 @@ public class LoadLeaderboard : MonoBehaviour {
         Debug.Log("count " + listOfScores.Count);
         List<PlayerScore> SortedList = listOfScores.OrderByDescending(x => x.score).ToList();
 
-        //first.text = "1st\t\t\t" + SortedList[0].name + "\t\t\t" + SortedList[0].score;
-        //second.text = "2nd\t\t\t" + SortedList[1].name + "\t\t\t" + SortedList[1].score;
-        //third.text = "3rd\t\t\t" + SortedList[2].name + "\t\t\t" + SortedList[2].score;
-        //fourth.text = "4th\t\t\t" + SortedList[3].name + "\t\t\t" + SortedList[3].score;
-        //fifth.text = "5th\t\t\t" + SortedList[4].name + "\t\t\t" + SortedList[4].score;
         firstName.text = SortedList[0].name;
         firstScore.text = SortedList[0].score.ToString();
         secondName.text = SortedList[1].name;
@@ -59,8 +54,6 @@ public class LoadLeaderboard : MonoBehaviour {
         {
             string line;
 
-            // Read and display lines from the file until the end of 
-            // the file is reached.
             while ((line = sr.ReadLine()) != null)
             {
                 PlayerScore player = new PlayerScore();

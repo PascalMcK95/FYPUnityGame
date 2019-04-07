@@ -30,6 +30,7 @@ public class Enemy : Character
     float randomY;
 
     public LayerMask caveLayer;
+    public LayerMask playerLayer;
     RaycastHit2D hit;
 
     public int health;
@@ -70,6 +71,10 @@ public class Enemy : Character
     Vector3 rayPosition;
     Vector3 playerRayPosition;
 
+    Quaternion targetRotation;
+    float str;
+    Quaternion rotation;
+
     void Start()
     {
        
@@ -93,6 +98,7 @@ public class Enemy : Character
 
     void Update()
     {
+        CheckRotation();
         rayPosition = new Vector3(transform.position.x, transform.position.y + 4, transform.position.z);
         position = transform.position;
         playerPosition = GameObject.FindGameObjectWithTag("Player").transform.position;
@@ -116,6 +122,13 @@ public class Enemy : Character
         }
     }
 
+    private void CheckRotation()
+    {
+        targetRotation = Quaternion.LookRotation(playerPosition - transform.position);
+         str = Mathf.Min(10 * Time.deltaTime, 1);
+         rotation = Quaternion.Lerp(transform.rotation, targetRotation, str);
+    }
+
     private void CheckForCollisions()
     {
         var hitColliders = Physics2D.OverlapCircleAll(attackPosition.position, 6);
@@ -136,9 +149,11 @@ public class Enemy : Character
         //attack radius
         //Gizmos.color = Color.red;
         //Gizmos.DrawWireSphere(attackPosition.position, attackRange);
+
         // line of sight
         Gizmos.color = Color.green;
         Gizmos.DrawLine(rayPosition, playerRayPosition);
+
         // blocking object
         Gizmos.color = Color.blue;
         Gizmos.DrawLine(hleft, rayPosition);
@@ -178,7 +193,6 @@ public class Enemy : Character
     {
         if (collision.gameObject.tag == "ThrowingKnife")
         {
-           // Debug.Log("hit by knife");
             this.TakeDamage(damage);
         }
     }
@@ -191,7 +205,6 @@ public class Enemy : Character
 
         position = new Vector2(randomX, randomY);
         transform.SetPositionAndRotation(position,Quaternion.identity);
-       // Debug.Log(randomX + " " + randomY + " Respawn " + count);
         CheckForCollisions();
     }
 
@@ -209,23 +222,35 @@ public class Enemy : Character
     {
         if (timeBetweenThrowKnife <= 0)
         {
-            if (facingLeft)
+            Vector2 knifePosition;
+            var xDiff = playerPosition.x - transform.position.x;
+            var YDiff = playerPosition.y - transform.position.y;
+            if (xDiff >= 0 && YDiff >= 0)
             {
-                //Debug.Log("Enemy throwing left");
-                Vector2 knifePosition = new Vector2(transform.position.x - 5, transform.position.y + 5);
-                Instantiate(throwingKnife, knifePosition, Quaternion.Euler(new Vector3(0, 0, 90)));
+                knifePosition = new Vector2(transform.position.x + 7, transform.position.y + 3);
+                Instantiate(throwingKnife, knifePosition, Quaternion.Euler(new Vector3(180, 0, -135)));//tr
+               // Debug.Log("enemy " + transform.position + " player " + playerPosition + " xdiff " + xDiff + " yDiff " + YDiff);
             }
+            else if (xDiff < 0 && YDiff < 0)
+            {
+                knifePosition = new Vector2(transform.position.x - 7, transform.position.y + 3);
+                Instantiate(throwingKnife, knifePosition, Quaternion.Euler(new Vector3(0, 0, 135)));//bl
+            }
+            else if (xDiff > 0 && YDiff < 0)
+            {
+                knifePosition = new Vector2(transform.position.x + 7, transform.position.y + 3);
+                Instantiate(throwingKnife, knifePosition, Quaternion.Euler(new Vector3(180, 0, 315)));//br
+            }
+
             else
             {
-               // Debug.Log("Enemy throwing right " + transform.position.y + " " + (transform.position.y  +8));
-                Vector2 knifePosition = new Vector2(transform.position.x + 5, transform.position.y + 5);
-                Instantiate(throwingKnife, knifePosition, Quaternion.Euler(new Vector3(0, 180, 90)));
+                knifePosition = new Vector2(transform.position.x - 7, transform.position.y + 3);
+                Instantiate(throwingKnife, knifePosition, Quaternion.Euler(new Vector3(0, 0, 45)));//tl
             }
-            timeBetweenThrowKnife = 2;
+
+            timeBetweenThrowKnife = 3;
         }
         timeBetweenThrowKnife -= Time.deltaTime;
-
-        //Debug.Log("time " + timeBetweenThrowKnife);
     }
 
 
@@ -238,7 +263,6 @@ public class Enemy : Character
             {
                 position = transform.position;
                 enemyDirection = transform.localScale;
-                //CheckLineOfSight();
               
                 CheckIfFacingRightDirection();
                 anim.ResetTrigger("Run");
@@ -249,45 +273,14 @@ public class Enemy : Character
                 {
                     anim.ResetTrigger("Attack");
 
-                    WalkToPlayer();
+                     WalkToPlayer();
 
-                    Vector2 left = new Vector2(transform.position.x - 5, transform.position.y + 5);
-                    Vector2 right = new Vector2(transform.position.x + 5, transform.position.y + 5);
+                    RaycastHit2D hits;
+                    hits = Physics2D.Linecast(rayPosition, playerRayPosition, playerLayer);
 
-                    Debug.DrawRay(left, Vector2.left * 50f, Color.green);
-                    Debug.DrawRay(right, Vector2.right * 50f, Color.red);
-
-                    if (Vector3.Distance(position, playerPosition) >= 6f)
+                    if (hits.collider != null)
                     {
-                        RaycastHit2D []  hitLeft = Physics2D.RaycastAll(left, Vector2.left * 50f);
-                        RaycastHit2D[] hitRight = Physics2D.RaycastAll(right, Vector2.right * 50f);
-
-                        if (hitLeft != null)
-                        {
-                            for (int i = 0; i < hitLeft.Length; i++)
-                            {
-                                if(hitLeft[i].rigidbody!= null)
-                                {
-                                    if (hitLeft[i].rigidbody.tag == "Player")
-                                    {
-                                        ThrowKnife();
-                                    }
-                                }
-                            }
-                        }
-                        if(hitRight!= null)
-                        {
-                            for (int i = 0; i < hitRight.Length; i++)
-                            {
-                                if (hitRight[i].rigidbody != null)
-                                {
-                                    if (hitRight[i].rigidbody.tag == "Player")
-                                    {
-                                        ThrowKnife();
-                                    }
-                                }
-                            }
-                        }
+                        ThrowKnife();
                     }
                 }
                 else if (Vector3.Distance(position, playerPosition) <= 4f)
@@ -304,8 +297,6 @@ public class Enemy : Character
             anim.SetTrigger("Idle");
         }
     }
-
-   
 
     private void WalkToPlayer()
     {
@@ -371,7 +362,7 @@ public class Enemy : Character
             {
                 for (int i = 0; i < playersToDamage.Length; i++)
                 {
-                    if (playersToDamage[i].tag != "Untagged")
+                    if (playersToDamage[i].tag == "Player")
                     {
                         playersToDamage[i].GetComponent<Player>().TakeDamage(damage);
                     }
@@ -402,140 +393,4 @@ public class Enemy : Character
         health -= damage;
         anim.SetTrigger("Damaged");
     }
-
-    //private void CheckOutsideSpawn()
-    //{
-    //    position = transform.position;
-    //    float distance = 2000.0f;
-
-    //    directionCheck = Vector2.down;
-    //    hit = Physics2D.Raycast(position, directionCheck, distance, caveLayer);
-    //    if (hit.collider != null)
-    //    {
-    //        Debug.Log("outside down *****");
-    //        Respawn();
-    //        CheckSpawnPosition();
-    //    }
-
-    //    directionCheck = Vector2.up;
-    //    hit = Physics2D.Raycast(position, directionCheck, distance, caveLayer);
-    //    if (hit.collider != null)
-    //    {
-    //        Debug.Log("outside up");
-    //        Respawn();
-    //        CheckSpawnPosition();
-    //    }
-
-    //    directionCheck = Vector2.left;
-    //    hit = Physics2D.Raycast(position, directionCheck, distance, caveLayer);
-    //    if (hit.collider != null)
-    //    {
-    //        Debug.Log("outside left *********");
-    //        Respawn();
-    //        CheckSpawnPosition();
-    //    }
-
-    //    directionCheck = Vector2.right;
-    //    hit = Physics2D.Raycast(position, directionCheck, distance, caveLayer);
-    //    if (hit.collider != null)
-    //    {
-    //        Debug.Log("outside right");
-    //        Respawn();
-    //        CheckSpawnPosition();
-    //    }
-    //}
-
-    //private void CheckSpawnPosition()
-    //{
-    //    directionCheck = Vector2.down;
-    //    position = transform.position;
-    //    float distance = 10;
-
-    //    hit = Physics2D.Raycast(position, directionCheck, distance, caveLayer);
-    //   // Debug.DrawLine(position, directionCheck);
-    //    if (hit.collider != null)
-    //    {
-    //        Debug.Log(hit.distance + " down green");
-    //         Debug.DrawRay(transform.position, Vector2.down * 15, Color.green,20);
-    //        //  Debug.Log("need to move up");
-    //       // moveEnemy.y += 15;
-    //         Respawn();
-    //    }
-
-    //    directionCheck = Vector2.up;
-    //    hit = Physics2D.Raycast(position, directionCheck, distance, caveLayer);
-    //   // Debug.DrawLine(position, directionCheck);
-    //    if (hit.collider != null)
-    //    {
-    //        Debug.Log(hit.distance + " up red");
-
-    //         Debug.DrawRay(transform.position, Vector2.up*15, Color.red,20);
-    //        Respawn();
-    //      //  moveEnemy.y += -10;
-    //    }
-    //    directionCheck = Vector2.left;
-    //    hit = Physics2D.Raycast(position, directionCheck, distance, caveLayer);
-    //   // Debug.DrawLine(position, directionCheck);
-    //    if (hit.collider != null)
-    //    {
-    //        Debug.Log(hit.distance + " left blue");
-    //        Debug.DrawRay(transform.position, Vector2.left * 15, Color.blue,20);
-    //        Respawn();
-    //        //  Debug.Log("need to move right");
-    //       // moveEnemy.x += 15;
-    //    }
-    //    directionCheck = Vector2.right;
-    //    hit = Physics2D.Raycast(position, directionCheck, distance, caveLayer);
-    //   // Debug.DrawLine(position, directionCheck);
-    //    if (hit.collider != null)
-    //    {
-    //        Debug.Log(hit.distance + " right yellow");
-    //        Debug.DrawRay(transform.position, Vector2.right * 15, Color.yellow,20);
-    //        Respawn();
-    //        //Debug.Log("need to move left");
-    //       // moveEnemy.x += -10;
-    //    }
-
-    //   // CheckSpawnPosition();
-    //}
-
-    //private void CheckOutsideMap()
-    //{
-    //    directionCheck = Vector2.down;
-    //    position = transform.position;
-    //    float distance = 1000;
-
-    //    hit = Physics2D.Raycast(position, directionCheck, distance, caveLayer);
-    //    // Debug.DrawLine(position, directionCheck);
-    //    if (hit.collider == null)
-    //    {
-    //        Debug.Log("outside down");
-    //        Respawn();
-    //    }
-    //    directionCheck = Vector2.up;
-    //    hit = Physics2D.Raycast(position, directionCheck, distance, caveLayer);
-    //    // Debug.DrawLine(position, directionCheck);
-    //    if (hit.collider == null)
-    //    {
-    //        Debug.Log("outside up");
-    //        Respawn();
-    //    }
-    //    directionCheck = Vector2.left;
-    //    hit = Physics2D.Raycast(position, directionCheck, distance, caveLayer);
-    //    // Debug.DrawLine(position, directionCheck);
-    //    if (hit.collider == null)
-    //    {
-    //        Debug.Log("outside left");
-    //        Respawn();
-    //    }
-    //    directionCheck = Vector2.right;
-    //    hit = Physics2D.Raycast(position, directionCheck, distance, caveLayer);
-    //    // Debug.DrawLine(position, directionCheck);
-    //    if (hit.collider == null)
-    //    {
-    //        Debug.Log("outside right");
-    //        Respawn();
-    //    }
-
-    //}
 }

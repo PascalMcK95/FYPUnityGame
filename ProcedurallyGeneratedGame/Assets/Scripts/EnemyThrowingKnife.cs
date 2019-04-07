@@ -8,39 +8,29 @@ public class EnemyThrowingKnife : MonoBehaviour {
     //public float range;
     private Rigidbody2D rigidBody;
     private Vector2 direction;
-    GameObject player;
-    private float startTime = 3;
+    //GameObject player;
+    public float startTime = 3;
+    Vector3 player;
+    Vector3 movementVector;
     //Vector2 playerDirection;
     // Use this for initialization
     void Start()
     {
         rigidBody = GetComponent<Rigidbody2D>();
-        player = GameObject.FindGameObjectWithTag("Player");
+       player = GameObject.FindGameObjectWithTag("Player").transform.position;
+        movementVector = (player - transform.position).normalized * speed;
 
-        if(player.transform.position.x < transform.position.x)
-        {
-
-            Debug.Log("Enemy knife going left");
-            direction = Vector2.left;
-        }
-        else{
-            Debug.Log("Enemy knife going right");
-            direction = Vector2.right;
-        }
-       rigidBody.velocity = direction * speed;
     }
 
-    // Update is called once per frame
     void Update()
     {
-   
+        transform.position += movementVector * Time.deltaTime;
         if (startTime >= 0)
         {
             startTime -= Time.deltaTime;
         }
         else
         {
-            Debug.Log("destroying knife");
             Destroy(this.gameObject);
         }
     }

@@ -6,31 +6,24 @@ public class ThrowKnife : MonoBehaviour {
 
     public Score scoreBoard;
     public float speed;
-    //public float range;
     private Rigidbody2D rigidBody;
     private Vector3 direction;
     GameObject player;
     private float startTime = 3;
     Camera camera;
-    //Vector2 playerDirection;
-    // Use this for initialization
-    void Start () {
-        //scoreBoard = new Score();
+    Vector3 movementVector;
+    GameObject score;
+    
+    void Start ()
+    {
+        score = GameObject.FindWithTag("Score");
+        scoreBoard = score.GetComponent<Score>();
         camera = Camera.main;
         rigidBody = GetComponent<Rigidbody2D>();
         player = GameObject.FindGameObjectWithTag("Player");
-        //if (player.transform.rotation.y > 0)
-        //{
-        //    direction = Vector2.right;
-        //}
-        //else
-        //{
-        //    direction = Vector2.left;
-        //}
-
         direction = camera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, camera.nearClipPlane));
-        //direction = Input.mousePosition;
-       // transform.rotation = Quaternion.LookRotation(direction);
+        movementVector = (direction - transform.position).normalized*speed*10;
+      
     }
 	
 	// Update is called once per frame
@@ -48,8 +41,7 @@ public class ThrowKnife : MonoBehaviour {
 
     private void FixedUpdate()
     {
-       //rigidBody.velocity = direction * speed;
-       transform.position = Vector3.MoveTowards(transform.position, direction, speed / 10);
+        transform.position += movementVector * Time.deltaTime;
     }
 
     private void OnBecameInvisible()
@@ -64,7 +56,7 @@ public class ThrowKnife : MonoBehaviour {
         {
             Debug.Log("Enemy Hit");
             Destroy(this.gameObject);
-           // scoreBoard.AddDamageToScore();
+            scoreBoard.AddDamageToScore();
         }
 
         if (collision.gameObject.tag == "CaveMesh")

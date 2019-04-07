@@ -71,8 +71,11 @@ public class Player : Character
             Debug.Log("Health picked up");
             Destroy(collision.gameObject);
             healthBar.AddHeart();
-            health += 10;
-            
+
+            if(health < 50)
+            {
+                health += 10;
+            }
         }
     }
 
@@ -101,17 +104,6 @@ public class Player : Character
     {
         if(timeSinceLastAttack <= 0)
         {
-            //if (!facingLeft)
-            //{
-            //    Vector2 knifePosition = new Vector2(transform.position.x - 4, transform.position.y + 3);
-            //    Instantiate(throwingKnife, knifePosition, Quaternion.Euler(new Vector3(0, 0, 90)));
-            //}
-            //else
-            //{
-            //    Vector2 knifePosition = new Vector2(transform.position.x + 4, transform.position.y + 3);
-            //    Instantiate(throwingKnife, knifePosition, Quaternion.Euler(new Vector3(0, 180, 90)));
-            //}
-
             Vector3 finalPosition =  camera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, camera.nearClipPlane));
             Vector2 knifePosition;
             var xDiff = finalPosition.x - transform.position.x;
@@ -136,9 +128,6 @@ public class Player : Character
                 knifePosition = new Vector2(transform.position.x - 7, transform.position.y + 3);
                 Instantiate(throwingKnife, knifePosition, Quaternion.Euler(new Vector3(0, 0, 45)));//tl
             }
-            
-            //Vector3 knifePosition = finalPosition - transform.position;
-            //Instantiate(throwingKnife, knifePosition, Quaternion.Euler(new Vector3(0, 0, 90)));
 
             timeSinceLastAttack = timeBetweenThrowKnife;
         }

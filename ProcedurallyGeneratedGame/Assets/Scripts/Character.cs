@@ -6,9 +6,6 @@ public abstract class Character : MonoBehaviour {
 
     [SerializeField]
     protected float speed;
-    [SerializeField]
-    //protected float health;
-    Vector3 theScale;
 
     public Animator anim;
     private Rigidbody2D rigidbody;
@@ -16,8 +13,7 @@ public abstract class Character : MonoBehaviour {
     protected bool facingLeft = false;
 
     protected bool isAttacking = false;
-
-    
+   
     protected Vector2 direction;
 
     protected virtual void Start()
@@ -40,11 +36,6 @@ public abstract class Character : MonoBehaviour {
         {
             rigidbody.MovePosition(rigidbody.position + direction * Time.fixedDeltaTime * speed);
         }
-        else
-        {
-            Debug.Log("cant move attacking");
-        }
-
     }
 
     public float Speed

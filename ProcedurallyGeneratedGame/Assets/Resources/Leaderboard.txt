@@ -15,3 +15,5 @@ Mary,16
 Tommy,312
 Mark,355
 Jimmy,128
+Pascal,1084
+Jack,524
