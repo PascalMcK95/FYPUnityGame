@@ -19,13 +19,15 @@ public class EnemyThrowingKnife : MonoBehaviour {
         rigidBody = GetComponent<Rigidbody2D>();
        player = GameObject.FindGameObjectWithTag("Player").transform.position;
         player.y += 3;
-        movementVector = (player - transform.position).normalized * speed;
+        movementVector = (player - transform.position);
+        movementVector.z = 0;
+        movementVector = movementVector.normalized;
 
     }
 
     void Update()
     {
-        transform.position += movementVector * Time.deltaTime;
+        transform.position += movementVector * speed * Time.deltaTime;
         if (startTime >= 0)
         {
             startTime -= Time.deltaTime;
@@ -51,7 +53,7 @@ public class EnemyThrowingKnife : MonoBehaviour {
         
         if (collision.gameObject.tag == "Player")
         {
-            Debug.Log("Enemy knife hit palyer");
+           // Debug.Log("Enemy knife hit palyer");
             Destroy(this.gameObject);
         }
 

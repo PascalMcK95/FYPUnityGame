@@ -26,9 +26,11 @@ public class Player : Character
     public static string finalScore;
     float attackReset;
     public LoadSceneOnClick loadScene;
+    float timeSinceHit;
 
     void Start()
     {
+        timeSinceHit = 0f;
         camera = Camera.main;
         healthBar = gameObject.GetComponent<Health>();
         dead = false;
@@ -41,17 +43,15 @@ public class Player : Character
     {
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(attackPosition.position, attackRange);
-        Gizmos.color = Color.green;
-        var poos = new Vector3(transform.position.x, transform.position.y+4, transform.position.z);
-        Gizmos.DrawCube(poos, new Vector3(20, 10, 5));
     }
 
     protected override void Update()
     {
+        ResetHit();
         direction = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")).normalized * 10;
         CheckDirection();
         Animate();
-
+      
         if (health <= 0 && dead == false)
         {
             Death();
@@ -62,11 +62,24 @@ public class Player : Character
         base.Update();
     }
 
+    private void ResetHit()
+    {
+        if (timeSinceHit <= 0)
+        {
+            anim.SetBool("Damaged", false);
+            timeSinceHit -= Time.deltaTime;
+        }
+        else
+        {
+            timeSinceHit -= Time.deltaTime;
+        }
+    }
+
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject.tag == "HealthDrop")
         {
-            Debug.Log("Health picked up");
+           // Debug.Log("Health picked up");
             Destroy(collision.gameObject);
             healthBar.AddHeart();
 
@@ -94,7 +107,8 @@ public class Player : Character
         anim.ResetTrigger("Run");
         // anim.ResetTrigger("Attack");
         anim.SetBool("Attack", false);
-        anim.SetTrigger("Damaged");
+        anim.SetBool("Damaged", true);
+        timeSinceHit = 0.5f;
         healthBar.RemoveHeart();
     }
 
@@ -126,34 +140,35 @@ public class Player : Character
             //    knifePosition = new Vector2(transform.position.x - 7, transform.position.y + 3);
             //    Instantiate(throwingKnife, knifePosition, Quaternion.Euler(new Vector3(0, 0, 45)));//tl
             //}
-            Debug.Log(xDiff + "  " + YDiff);
 
-            if (((xDiff < 20 && xDiff > -20) || (xDiff > -20 && xDiff < 20)) && YDiff > 10)
+            //Debug.Log(xDiff + "  " + YDiff);
+
+            if (((xDiff < 20 && xDiff > -30) || (xDiff > -20 && xDiff < 20)) && YDiff > 10)
             {
                 knifePosition = new Vector2(transform.position.x, transform.position.y + 8);
                 Instantiate(throwingKnife, knifePosition, Quaternion.Euler(new Vector3(180, 0, 180)));//up
             }
-            else if(xDiff < -30 && YDiff > 30)
+            else if (xDiff < -20 && YDiff > 30)
             {
                 knifePosition = new Vector2(transform.position.x - 7, transform.position.y + 3);
                 Instantiate(throwingKnife, knifePosition, Quaternion.Euler(new Vector3(0, 0, 45)));//tl
             }
-            else if(xDiff < -30 && YDiff < 30 && YDiff > -30)
+            else if (xDiff < -30 && YDiff < 30 && YDiff > -30)
             {
                 knifePosition = new Vector2(transform.position.x - 5, transform.position.y + 3);
                 Instantiate(throwingKnife, knifePosition, Quaternion.Euler(new Vector3(0, 0, 90)));//left
             }
-            else if (xDiff > 30 && YDiff < 30 && YDiff < -30)
+            else if (xDiff > 20 && YDiff < 30 && YDiff < -30)
             {
                 knifePosition = new Vector2(transform.position.x + 7, transform.position.y + 3);
                 Instantiate(throwingKnife, knifePosition, Quaternion.Euler(new Vector3(180, 0, 315)));//br 
             }
-            else if(xDiff > 30 && (YDiff < 30 && YDiff > -30))
+            else if (xDiff > 30 && (YDiff < 30 && YDiff > -30))
             {
                 knifePosition = new Vector2(transform.position.x + 5, transform.position.y + 3);
                 Instantiate(throwingKnife, knifePosition, Quaternion.Euler(new Vector3(180, 0, 270)));//right
             }
-            else if ((xDiff > -20 && xDiff < 20) && (YDiff <-30))
+            else if ((xDiff > -20 && xDiff < 20) && (YDiff < -30))
             {
                 knifePosition = new Vector2(transform.position.x, transform.position.y - 3);
                 Instantiate(throwingKnife, knifePosition, Quaternion.Euler(new Vector3(180, 0, 360)));//down
@@ -169,6 +184,8 @@ public class Player : Character
                 Instantiate(throwingKnife, knifePosition, Quaternion.Euler(new Vector3(0, 0, 135)));//bl
             }
 
+
+
             timeSinceLastAttack = timeBetweenThrowKnife;
         }
 
@@ -183,7 +200,7 @@ public class Player : Character
         anim.ResetTrigger("Run");
         //anim.ResetTrigger("Attack");
         anim.SetBool("Attack", false);
-        anim.ResetTrigger("Damaged");
+        anim.SetBool("Damaged", false);
         anim.SetBool("Death", true);
         // Destroy(this.gameObject, 2);
         finalScore = scoreBoard.scoreText.text;
@@ -226,7 +243,7 @@ public class Player : Character
             if (Input.GetMouseButtonDown(1) || Input.GetKeyDown("space"))
             {
                 anim.ResetTrigger("Idle");
-                anim.ResetTrigger("Damaged");
+                anim.SetBool("Damaged", false);
                 anim.ResetTrigger("Run");
                 //Debug.Log("Attacking");
                 //anim.SetTrigger("Attack");
@@ -258,7 +275,7 @@ public class Player : Character
             anim.SetBool("Attack",false);
             //anim.ResetTrigger("Death");
             anim.ResetTrigger("Idle");
-            anim.ResetTrigger("Damaged");
+            anim.SetBool("Damaged", false);
             anim.SetBool("Death", true);
         }
 

@@ -10,6 +10,7 @@ public class CheckInput : MonoBehaviour {
     public InputField input;
     public Text scoreText;
     string textToWrite;
+    public LoadSceneOnClick sceneLoader;
 
     void Start()
     {
@@ -31,7 +32,7 @@ public class CheckInput : MonoBehaviour {
     public void ValidateInput()
     {
 
-        if (input != null)
+        if (input.text != "")
         {
             Debug.Log("Writing to file " + input + " score: " + scoreText.text);
             textToWrite = input.text + "," + scoreText.text;
@@ -47,5 +48,6 @@ public class CheckInput : MonoBehaviour {
         StreamWriter writer = new StreamWriter(path, true);
         writer.WriteLine(text);
         writer.Close();
+        sceneLoader.LoadSceneByIndex(0);
     }
 }

@@ -9,7 +9,7 @@ public class ThrowKnife : MonoBehaviour {
     private Rigidbody2D rigidBody;
     private Vector3 direction;
     GameObject player;
-    private float startTime = 3;
+    public float timeBeforeDestroy = 2;
     Camera camera;
     Vector3 movementVector;
     GameObject score;
@@ -26,19 +26,16 @@ public class ThrowKnife : MonoBehaviour {
         player = GameObject.FindGameObjectWithTag("Player");
         direction = camera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, camera.nearClipPlane));
         movementVector = (direction - transform.position);
-
-        //transform.rotation = Quaternion.Slerp(transform.rotation,
-        //                                   Quaternion.LookRotation(movementVector),
-        //                                   Time.deltaTime);
-
+        movementVector.z = 0;
         movementVector = movementVector.normalized;
+ 
     }
 	
 	// Update is called once per frame
 	void Update () {
-        if(startTime >= 0)
+        if(timeBeforeDestroy >= 0)
         {
-            startTime -= Time.deltaTime;
+            timeBeforeDestroy -= Time.deltaTime;
         }
         else
         {
@@ -62,7 +59,7 @@ public class ThrowKnife : MonoBehaviour {
         //Debug.Log(collision.gameObject.tag);
         if (collision.gameObject.tag == "Enemy")
         {
-            Debug.Log("Enemy Hit");
+           // Debug.Log("Enemy Hit");
             Destroy(this.gameObject);
             scoreBoard.AddDamageToScore(10);
         }
