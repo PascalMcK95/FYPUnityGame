@@ -9,4 +9,13 @@ public class LoadSceneOnClick : MonoBehaviour {
     {
         SceneManager.LoadScene(index);
     }
+
+    public void QuitGame()
+    {
+        #if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+        #else
+         Application.Quit(); 
+        #endif
+    }
 }

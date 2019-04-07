@@ -14,6 +14,18 @@ public class CheckInput : MonoBehaviour {
     void Start()
     {
         scoreText.text = Player.finalScore.ToString();
+
+        string path = "Assets/Resources/";
+        string filename = "Leaderboard.txt";
+
+     
+            if (!Directory.Exists(path))
+                Directory.CreateDirectory(path);
+            else
+            {
+                if (!File.Exists(filename))
+                    File.Create(path + filename);
+            }
     }
 
     public void ValidateInput()
@@ -35,8 +47,5 @@ public class CheckInput : MonoBehaviour {
         StreamWriter writer = new StreamWriter(path, true);
         writer.WriteLine(text);
         writer.Close();
-
-        //Re-import the file to update the reference in the editor
-        AssetDatabase.ImportAsset(path);
     }
 }

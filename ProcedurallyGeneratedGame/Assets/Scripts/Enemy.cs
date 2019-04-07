@@ -82,11 +82,6 @@ public class Enemy : Character
         dead = false;
         playerDead = false;
 
-        //stops rotation when agent is added
-        agent.updateUpAxis = false;
-        agent.updateRotation = false;
-
-
         //resets z position to 0;
         var newPosition = transform.position;
         newPosition.z = 0;
@@ -98,7 +93,7 @@ public class Enemy : Character
 
     void Update()
     {
-        CheckRotation();
+        //CheckRotation();
         rayPosition = new Vector3(transform.position.x, transform.position.y + 4, transform.position.z);
         position = transform.position;
         playerPosition = GameObject.FindGameObjectWithTag("Player").transform.position;
@@ -122,12 +117,12 @@ public class Enemy : Character
         }
     }
 
-    private void CheckRotation()
-    {
-        targetRotation = Quaternion.LookRotation(playerPosition - transform.position);
-         str = Mathf.Min(10 * Time.deltaTime, 1);
-         rotation = Quaternion.Lerp(transform.rotation, targetRotation, str);
-    }
+    //private void CheckRotation()
+    //{
+    //    targetRotation = Quaternion.LookRotation(playerPosition - transform.position);
+    //     str = Mathf.Min(10 * Time.deltaTime, 1);
+    //     rotation = Quaternion.Lerp(transform.rotation, targetRotation, str);
+    //}
 
     private void CheckForCollisions()
     {
@@ -225,27 +220,71 @@ public class Enemy : Character
             Vector2 knifePosition;
             var xDiff = playerPosition.x - transform.position.x;
             var YDiff = playerPosition.y - transform.position.y;
-            if (xDiff >= 0 && YDiff >= 0)
+            //if (xDiff >= 0 && YDiff >= 0)
+            //{
+            //    knifePosition = new Vector2(transform.position.x + 7, transform.position.y + 3);
+            //    Instantiate(throwingKnife, knifePosition, Quaternion.Euler(new Vector3(180, 0, -135)));//tr
+            //   // Debug.Log("enemy " + transform.position + " player " + playerPosition + " xdiff " + xDiff + " yDiff " + YDiff);
+            //}
+            //else if (xDiff < 0 && YDiff < 0)
+            //{
+            //    knifePosition = new Vector2(transform.position.x - 7, transform.position.y + 3);
+            //    Instantiate(throwingKnife, knifePosition, Quaternion.Euler(new Vector3(0, 0, 135)));//bl
+            //}
+            //else if (xDiff > 0 && YDiff < 0)
+            //{
+            //    knifePosition = new Vector2(transform.position.x + 7, transform.position.y + 3);
+            //    Instantiate(throwingKnife, knifePosition, Quaternion.Euler(new Vector3(180, 0, 315)));//br
+            //}
+
+            //else
+            //{
+            //    knifePosition = new Vector2(transform.position.x - 7, transform.position.y + 3);
+            //    Instantiate(throwingKnife, knifePosition, Quaternion.Euler(new Vector3(0, 0, 45)));//tl
+            //}
+
+
+            Debug.Log(xDiff + "  " + YDiff);
+
+            if (((xDiff < 10 && xDiff > -10) || (xDiff > -10 && xDiff < 10)) && YDiff > 10)
+            {
+                knifePosition = new Vector2(transform.position.x, transform.position.y + 9);
+                Instantiate(throwingKnife, knifePosition, Quaternion.Euler(new Vector3(180, 0, 180)));//up
+            }
+            else if (xDiff < -15 && YDiff > 15)
+            {
+                knifePosition = new Vector2(transform.position.x - 7, transform.position.y + 3);
+                Instantiate(throwingKnife, knifePosition, Quaternion.Euler(new Vector3(0, 0, 45)));//tl
+            }
+            else if (xDiff < -15 && YDiff < 15 && YDiff > -15)
+            {
+                knifePosition = new Vector2(transform.position.x - 5, transform.position.y + 3);
+                Instantiate(throwingKnife, knifePosition, Quaternion.Euler(new Vector3(0, 0, 90)));//left
+            }
+            else if (xDiff > 15 && YDiff < 15 && YDiff < -15)
+            {
+                knifePosition = new Vector2(transform.position.x + 7, transform.position.y + 3);
+                Instantiate(throwingKnife, knifePosition, Quaternion.Euler(new Vector3(180, 0, 315)));//br 
+            }
+            else if (xDiff > 15 && (YDiff < 15 && YDiff > -15))
+            {
+                knifePosition = new Vector2(transform.position.x + 5, transform.position.y + 3);
+                Instantiate(throwingKnife, knifePosition, Quaternion.Euler(new Vector3(180, 0, 270)));//right
+            }
+            else if ((xDiff > -10 && xDiff < 10) && (YDiff < -15))
+            {
+                knifePosition = new Vector2(transform.position.x, transform.position.y - 3);
+                Instantiate(throwingKnife, knifePosition, Quaternion.Euler(new Vector3(180, 0, 360)));//down
+            }
+            else if (xDiff >= 0 && YDiff >= 0)
             {
                 knifePosition = new Vector2(transform.position.x + 7, transform.position.y + 3);
                 Instantiate(throwingKnife, knifePosition, Quaternion.Euler(new Vector3(180, 0, -135)));//tr
-               // Debug.Log("enemy " + transform.position + " player " + playerPosition + " xdiff " + xDiff + " yDiff " + YDiff);
             }
             else if (xDiff < 0 && YDiff < 0)
             {
                 knifePosition = new Vector2(transform.position.x - 7, transform.position.y + 3);
                 Instantiate(throwingKnife, knifePosition, Quaternion.Euler(new Vector3(0, 0, 135)));//bl
-            }
-            else if (xDiff > 0 && YDiff < 0)
-            {
-                knifePosition = new Vector2(transform.position.x + 7, transform.position.y + 3);
-                Instantiate(throwingKnife, knifePosition, Quaternion.Euler(new Vector3(180, 0, 315)));//br
-            }
-
-            else
-            {
-                knifePosition = new Vector2(transform.position.x - 7, transform.position.y + 3);
-                Instantiate(throwingKnife, knifePosition, Quaternion.Euler(new Vector3(0, 0, 45)));//tl
             }
 
             timeBetweenThrowKnife = 3;

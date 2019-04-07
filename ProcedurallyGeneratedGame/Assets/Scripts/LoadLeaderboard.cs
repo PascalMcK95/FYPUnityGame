@@ -25,6 +25,7 @@ public class LoadLeaderboard : MonoBehaviour {
         listOfScores = new List<PlayerScore>();
         GetLeaderboard();
         DisplayLeaderboard();
+
     }
 
     private void DisplayLeaderboard()

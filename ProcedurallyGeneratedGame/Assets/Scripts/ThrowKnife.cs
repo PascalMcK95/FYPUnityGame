@@ -13,17 +13,25 @@ public class ThrowKnife : MonoBehaviour {
     Camera camera;
     Vector3 movementVector;
     GameObject score;
-    
+
+    private Quaternion _facing;
+
+
     void Start ()
-    {
+    { 
         score = GameObject.FindWithTag("Score");
         scoreBoard = score.GetComponent<Score>();
         camera = Camera.main;
         rigidBody = GetComponent<Rigidbody2D>();
         player = GameObject.FindGameObjectWithTag("Player");
         direction = camera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, camera.nearClipPlane));
-        movementVector = (direction - transform.position).normalized*speed*10;
-      
+        movementVector = (direction - transform.position);
+
+        //transform.rotation = Quaternion.Slerp(transform.rotation,
+        //                                   Quaternion.LookRotation(movementVector),
+        //                                   Time.deltaTime);
+
+        movementVector = movementVector.normalized;
     }
 	
 	// Update is called once per frame
@@ -41,7 +49,7 @@ public class ThrowKnife : MonoBehaviour {
 
     private void FixedUpdate()
     {
-        transform.position += movementVector * Time.deltaTime;
+        transform.position += movementVector * (Time.deltaTime * speed *5);
     }
 
     private void OnBecameInvisible()
@@ -56,7 +64,7 @@ public class ThrowKnife : MonoBehaviour {
         {
             Debug.Log("Enemy Hit");
             Destroy(this.gameObject);
-            scoreBoard.AddDamageToScore();
+            scoreBoard.AddDamageToScore(10);
         }
 
         if (collision.gameObject.tag == "CaveMesh")

@@ -31,8 +31,8 @@ public class Score : MonoBehaviour {
 
     }
 
-    public void AddDamageToScore()
+    public void AddDamageToScore(int damage)
     {
-        score += 10;
+        score += damage;
     }
 }

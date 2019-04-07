@@ -18,6 +18,7 @@ public class EnemyThrowingKnife : MonoBehaviour {
     {
         rigidBody = GetComponent<Rigidbody2D>();
        player = GameObject.FindGameObjectWithTag("Player").transform.position;
+        player.y += 3;
         movementVector = (player - transform.position).normalized * speed;
 
     }
