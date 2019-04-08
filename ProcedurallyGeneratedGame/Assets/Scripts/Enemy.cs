@@ -323,36 +323,8 @@ public class Enemy : Character
 
     private void WalkRandomly()
     {
-        //RaycastHit2D left;
-        //left = Physics2D.Linecast(rayPositionMiddle, Vector2.left, caveLayer);
-        //RaycastHit2D right; ;
-        //right = Physics2D.Linecast(rayPositionMiddle, Vector2.right, caveLayer);
-        //RaycastHit2D down; 
-        //down = Physics2D.Linecast(rayPositionMiddle, Vector2.down, caveLayer);
-        //RaycastHit2D up;
-        //up = Physics2D.Linecast(rayPositionMiddle, Vector2.up, caveLayer);
-
-        //if(left.collider == null)
-        //{
-        //    Debug.Log("Walking randomly left");
-        //    transform.position = Vector3.MoveTowards(position, Vector2.left*20, speed / 10);
-        //}
-        // if (right.collider == null)
-        //{
-        //    Debug.Log("Walking randomly right");
-        //    transform.position = Vector3.MoveTowards(position, Vector2.right * 20, speed / 10);
-        //}
-        // if (down.collider == null)
-        //{
-        //    Debug.Log("Walking randomly down");
-        //    transform.position = Vector3.MoveTowards(position, Vector2.down * 20, speed / 10);
-        //}
-        // if (up.collider == null)//else
-        //{
-        //    Debug.Log("Walking randomly up");
-        //    transform.position = Vector3.MoveTowards(position, Vector2.up * 20, speed / 10);
-        //}
-        if (Vector2.Distance(transform.position, newPosition) < 1)
+       
+        if (Vector2.Distance(transform.position, newPosition) < 3)
         {
             RandomPositionChange();
         }
@@ -361,6 +333,7 @@ public class Enemy : Character
         transform.position = Vector3.MoveTowards(transform.position, newPosition, Time.deltaTime * speed * 4);
         anim.SetTrigger("Run");
         Debug.Log("Walking randomly");
+
         //Debug.Log(transform.position.x + " " + transform.position.y + " new random position " + newPosition.x + " " + newPosition.y);
     }
 
