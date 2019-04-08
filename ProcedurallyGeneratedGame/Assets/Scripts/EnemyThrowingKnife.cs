@@ -5,14 +5,12 @@ using UnityEngine;
 public class EnemyThrowingKnife : MonoBehaviour {
 
     public float speed;
-    //public float range;
     private Rigidbody2D rigidBody;
     private Vector2 direction;
-    //GameObject player;
     public float startTime = 3;
     Vector3 player;
     Vector3 movementVector;
-    //Vector2 playerDirection;
+
     // Use this for initialization
     void Start()
     {
@@ -23,11 +21,15 @@ public class EnemyThrowingKnife : MonoBehaviour {
         movementVector.z = 0;
         movementVector = movementVector.normalized;
 
+
+        //Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        transform.rotation = Quaternion.LookRotation(Vector3.forward, player - transform.position);
+
     }
 
     void Update()
     {
-        transform.position += movementVector * speed * Time.deltaTime;
+        transform.position += movementVector * (speed +2) * Time.deltaTime;
         if (startTime >= 0)
         {
             startTime -= Time.deltaTime;

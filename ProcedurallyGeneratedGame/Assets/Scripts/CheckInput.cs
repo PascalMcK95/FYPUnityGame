@@ -18,15 +18,13 @@ public class CheckInput : MonoBehaviour {
 
         string path = "Assets/Resources/";
         string filename = "Leaderboard.txt";
-
-     
-            if (!Directory.Exists(path))
-                Directory.CreateDirectory(path);
-            else
-            {
-                if (!File.Exists(filename))
-                    File.Create(path + filename);
-            }
+            //if (!Directory.Exists(path))
+            //    Directory.CreateDirectory(path);
+            //else
+            //{
+            //    if (!File.Exists(filename))
+            //        File.Create(path + filename);
+            //}
     }
 
     public void ValidateInput()

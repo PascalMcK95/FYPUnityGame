@@ -66,11 +66,12 @@ public class Enemy : Character
     Vector3 rayPositionMiddle;
     Vector3 rayPositionTop;
     Vector3 rayPositionBottom;
-    Vector3 playerRayPositionMiddle;
     Vector3 playerRayPositionTop;
+    Vector3 playerRayPositionMid;
     Vector3 playerRayPositionBottom;
 
 
+    Vector2 newPosition;
     void Start()
     {
        
@@ -90,21 +91,10 @@ public class Enemy : Character
     void Update()
     {
         //CheckRotation();
-        rayPositionMiddle = new Vector3(transform.position.x, transform.position.y + 8, transform.position.z);
-        rayPositionTop = new Vector3(transform.position.x - 10, transform.position.y + 4, transform.position.z);
-        rayPositionBottom = new Vector3(transform.position.x + 10, transform.position.y, transform.position.z);
-        position = transform.position;
+        GetRays();
+
         playerPosition = GameObject.FindGameObjectWithTag("Player").transform.position;
-        playerRayPositionMiddle = new Vector3(playerPosition.x, playerPosition.y + 4, playerPosition.z);
-        playerRayPositionTop = new Vector3(playerPosition.x, playerPosition.y + 8, playerPosition.z);
-        playerRayPositionBottom = new Vector3(playerPosition.x, playerPosition.y, playerPosition.z);
-
-        hleft = new Vector2(playerPosition.x - 30, playerPosition.y);
-        hright = new Vector2(playerPosition.x + 30, playerPosition.y);
-
-        var newPosition = transform.position;
-        newPosition.z = 0;
-        transform.position = newPosition;
+        position = transform.position;
 
         if (health > 0)
         {
@@ -115,6 +105,24 @@ public class Enemy : Character
         {
             Death();
         }
+
+        if(detected == false)
+        {
+            WalkRandomly();
+        }
+    }
+
+    private void GetRays()
+    {
+        rayPositionMiddle = new Vector3(transform.position.x, transform.position.y + 8, transform.position.z);
+        rayPositionTop = new Vector3(transform.position.x, transform.position.y + 4, transform.position.z);
+        rayPositionBottom = new Vector3(transform.position.x, transform.position.y, transform.position.z);
+        playerRayPositionTop = new Vector3(playerPosition.x, playerPosition.y + 4, playerPosition.z);
+        playerRayPositionMid = new Vector3(playerPosition.x, playerPosition.y + 8, playerPosition.z);
+        playerRayPositionBottom = new Vector3(playerPosition.x, playerPosition.y, playerPosition.z);
+
+        hleft = new Vector2(playerPosition.x - 30, playerPosition.y);
+        hright = new Vector2(playerPosition.x + 30, playerPosition.y);
     }
 
     private void CheckForCollisions()
@@ -140,7 +148,7 @@ public class Enemy : Character
 
         // line of sight
         Gizmos.color = Color.green;
-        Gizmos.DrawLine(rayPositionMiddle, playerRayPositionMiddle);
+        Gizmos.DrawLine(rayPositionMiddle, playerRayPositionMid);
         Gizmos.DrawLine(rayPositionTop, playerRayPositionTop);
         Gizmos.DrawLine(rayPositionBottom, playerRayPositionBottom);
 
@@ -194,6 +202,14 @@ public class Enemy : Character
         {
             this.TakeDamage(damage);
         }
+        else if(collision.gameObject.tag == "CaveMesh")
+        {
+            RandomPositionChange();
+        }
+        else if (collision.gameObject.tag == "Enemy")
+        {
+            RandomPositionChange();
+        }
     }
 
     private void Respawn()
@@ -222,52 +238,19 @@ public class Enemy : Character
         if (timeBetweenThrowKnife <= 0)
         {
             Vector2 knifePosition;
-            var xDiff = playerPosition.x - transform.position.x;
-            var YDiff = playerPosition.y - transform.position.y;
-
-         //   Debug.Log(xDiff + "  " + YDiff);
-
-            if (((xDiff < 10 && xDiff > -10) || (xDiff > -10 && xDiff < 10)) && YDiff > 10)
-            {
-                knifePosition = new Vector2(transform.position.x, transform.position.y + 10);
-                Instantiate(throwingKnife, knifePosition, Quaternion.Euler(new Vector3(180, 0, 180)));//up
-            }
-            else if (xDiff < -15 && YDiff > 15)
+       
+            if (playerPosition.x < transform.position.x)
             {
                 knifePosition = new Vector2(transform.position.x - 7, transform.position.y + 3);
-                Instantiate(throwingKnife, knifePosition, Quaternion.Euler(new Vector3(0, 0, 45)));//tl
+                Instantiate(throwingKnife, knifePosition, Quaternion.Euler(new Vector3(0, 0, 0)));
             }
-            else if (xDiff < -15 && YDiff < 15 && YDiff > -15)
-            {
-                knifePosition = new Vector2(transform.position.x - 5, transform.position.y + 3);
-                Instantiate(throwingKnife, knifePosition, Quaternion.Euler(new Vector3(0, 0, 90)));//left
-            }
-            else if (xDiff > 15 && YDiff < 15 && YDiff < -15)
+            else if (playerPosition.x > transform.position.x)
             {
                 knifePosition = new Vector2(transform.position.x + 7, transform.position.y + 3);
-                Instantiate(throwingKnife, knifePosition, Quaternion.Euler(new Vector3(180, 0, 315)));//br 
+                Instantiate(throwingKnife, knifePosition, Quaternion.Euler(new Vector3(0, 0, 0)));
             }
-            else if (xDiff > 15 && (YDiff < 15 && YDiff > -15))
-            {
-                knifePosition = new Vector2(transform.position.x + 5, transform.position.y + 3);
-                Instantiate(throwingKnife, knifePosition, Quaternion.Euler(new Vector3(180, 0, 270)));//right
-            }
-            else if ((xDiff > -10 && xDiff < 10) && (YDiff < -15))
-            {
-                knifePosition = new Vector2(transform.position.x, transform.position.y - 3);
-                Instantiate(throwingKnife, knifePosition, Quaternion.Euler(new Vector3(180, 0, 360)));//down
-            }
-            else if (xDiff >= 0 && YDiff >= 0)
-            {
-                knifePosition = new Vector2(transform.position.x + 7, transform.position.y + 3);
-                Instantiate(throwingKnife, knifePosition, Quaternion.Euler(new Vector3(180, 0, -135)));//tr
-            }
-            else if (xDiff < 0 && YDiff < 0)
-            {
-                knifePosition = new Vector2(transform.position.x - 7, transform.position.y + 3);
-                Instantiate(throwingKnife, knifePosition, Quaternion.Euler(new Vector3(0, 0, 135)));//bl
-            }
-            //else just throw anyway?
+
+
             timeBetweenThrowKnife = 2;
         }
         timeBetweenThrowKnife -= Time.deltaTime;
@@ -296,7 +279,7 @@ public class Enemy : Character
 
                     RaycastHit2D hits;
                     //hits = Physics2D.Linecast(rayPosition, playerRayPosition, playerLayer);
-                    hits = Physics2D.Linecast(rayPositionMiddle, playerRayPositionMiddle, caveLayer);
+                    hits = Physics2D.Linecast(rayPositionMiddle, playerRayPositionTop, caveLayer);
 
                     if (hits.collider == null)
                     {
@@ -322,7 +305,7 @@ public class Enemy : Character
     {
       
         RaycastHit2D hitMiddle;
-        hitMiddle = Physics2D.Linecast(rayPositionMiddle, playerRayPositionMiddle, caveLayer);
+        hitMiddle = Physics2D.Linecast(rayPositionMiddle, playerRayPositionMid, caveLayer);
         RaycastHit2D hitTop;
         hitTop = Physics2D.Linecast(rayPositionTop, playerRayPositionTop, caveLayer);
         RaycastHit2D hitBottom;
@@ -337,6 +320,57 @@ public class Enemy : Character
             anim.SetTrigger("Run");
         }
     }
+
+    private void WalkRandomly()
+    {
+        //RaycastHit2D left;
+        //left = Physics2D.Linecast(rayPositionMiddle, Vector2.left, caveLayer);
+        //RaycastHit2D right; ;
+        //right = Physics2D.Linecast(rayPositionMiddle, Vector2.right, caveLayer);
+        //RaycastHit2D down; 
+        //down = Physics2D.Linecast(rayPositionMiddle, Vector2.down, caveLayer);
+        //RaycastHit2D up;
+        //up = Physics2D.Linecast(rayPositionMiddle, Vector2.up, caveLayer);
+
+        //if(left.collider == null)
+        //{
+        //    Debug.Log("Walking randomly left");
+        //    transform.position = Vector3.MoveTowards(position, Vector2.left*20, speed / 10);
+        //}
+        // if (right.collider == null)
+        //{
+        //    Debug.Log("Walking randomly right");
+        //    transform.position = Vector3.MoveTowards(position, Vector2.right * 20, speed / 10);
+        //}
+        // if (down.collider == null)
+        //{
+        //    Debug.Log("Walking randomly down");
+        //    transform.position = Vector3.MoveTowards(position, Vector2.down * 20, speed / 10);
+        //}
+        // if (up.collider == null)//else
+        //{
+        //    Debug.Log("Walking randomly up");
+        //    transform.position = Vector3.MoveTowards(position, Vector2.up * 20, speed / 10);
+        //}
+        if (Vector2.Distance(transform.position, newPosition) < 1)
+        {
+            RandomPositionChange();
+        }
+           
+
+        transform.position = Vector3.MoveTowards(transform.position, newPosition, Time.deltaTime * speed * 4);
+        anim.SetTrigger("Run");
+        Debug.Log("Walking randomly");
+        //Debug.Log(transform.position.x + " " + transform.position.y + " new random position " + newPosition.x + " " + newPosition.y);
+    }
+
+    void RandomPositionChange()
+    {
+        newPosition = new Vector2(UnityEngine.Random.Range(-100.0f, 100.0f), UnityEngine.Random.Range(-100.0f, 100.0f));
+        Debug.Log("Changing random position");
+    }
+
+ 
 
     private void MoveAroundObject()
     {

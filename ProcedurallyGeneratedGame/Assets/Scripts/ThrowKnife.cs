@@ -28,7 +28,10 @@ public class ThrowKnife : MonoBehaviour {
         movementVector = (direction - transform.position);
         movementVector.z = 0;
         movementVector = movementVector.normalized;
- 
+
+        Vector3 mousePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        transform.rotation = Quaternion.LookRotation(Vector3.forward, mousePos - transform.position);
+
     }
 	
 	// Update is called once per frame
