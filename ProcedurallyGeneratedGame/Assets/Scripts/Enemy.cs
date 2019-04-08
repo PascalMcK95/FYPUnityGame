@@ -193,6 +193,7 @@ public class Enemy : Character
         if (collision.gameObject.tag == "Player")
         {
             detected = true;
+            //CheckIfFacingRightDirection();
         }
     }
 
@@ -333,6 +334,21 @@ public class Enemy : Character
         transform.position = Vector3.MoveTowards(transform.position, newPosition, Time.deltaTime * speed * 4);
         anim.SetTrigger("Run");
         Debug.Log("Walking randomly");
+
+        if (transform.position.x > newPosition.x && facingLeft == false)
+        {
+            //face left
+            FlipAsset();
+            facingLeft = true;
+            Debug.Log("Facing left changing to right");
+        }
+        else if(transform.position.x < newPosition.x && facingLeft == true)
+        {
+            FlipAsset();
+            facingLeft = false;
+            Debug.Log("Facing right changing to left");
+        }
+
 
         //Debug.Log(transform.position.x + " " + transform.position.y + " new random position " + newPosition.x + " " + newPosition.y);
     }
